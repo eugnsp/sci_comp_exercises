@@ -11,7 +11,7 @@ These are various exercises in scientific computing.
 | 01.1003	| Uniform distribution on sphere	| Random distributions											|
 | 01.1011	| Ising model						| Monte-Carlo methods, Metropolis algorithm, Ising model		|
 
-Sources:
+Problem sources:
 
 | ID     	| Source / Book name 															|
 |:---------:|:------------------------------------------------------------------------------|

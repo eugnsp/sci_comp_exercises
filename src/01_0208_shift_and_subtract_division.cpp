@@ -1,6 +1,7 @@
 /*********************************************************************
 Shift-and-subtract division
 ---------------------------
+Problems and solutions in scientific computing by W.-H. Steeb et al.
 Chapter 2, problem 8
 
 Implement shift-and-subtract division algorithm for unsigned integers.

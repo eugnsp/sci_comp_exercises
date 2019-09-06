@@ -1,6 +1,7 @@
 /*********************************************************************
 Uniform distribution on sphere
 ------------------------------
+Problems and solutions in scientific computing by W.-H. Steeb et al.
 Chapter 10, problem 3
 
 Generate uniform sampling points on a sphere.
@@ -14,7 +15,6 @@ This file is covered by the LICENSE file in the root of this project.
 #include <cmath>
 #include <cstddef>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <random>
 #include <string>
@@ -218,7 +218,7 @@ void params_vs_temp(double field, std::string file_name)
 
 void lattice_after_sweep()
 {
-		std::size_t lattice_size = 100;
+	const std::size_t lattice_size = 100;
 	const double coupling = 1;
 	const double temp = 2 * coupling;
 	Ising_lattice lattice(lattice_size, temp, coupling, 0, true);

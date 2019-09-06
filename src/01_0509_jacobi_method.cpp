@@ -1,6 +1,7 @@
 /*********************************************************************
 Jacobi method
 -------------
+Problems and solutions in scientific computing by W.-H. Steeb et al.
 Chapter 5, problem 9
 
 Implement the Jacobi eigenvalue algorithm to find eigenvalues and

@@ -1,5 +1,16 @@
 #!/usr/bin/gnuplot
 
+# *********************************************************************
+# Uniform distribution on sphere
+# ------------------------------
+# Problems and solutions in scientific computing by W.-H. Steeb et al.
+# Chapter 10, problem 3
+
+# Generate uniform sampling points on a sphere.
+
+# This file is covered by the LICENSE file in the root of this project.
+# **********************************************************************
+
 set terminal pngcairo size 1000,700 enhanced
 set output '01_1011_ising_model_params.png'
 
@@ -31,4 +42,3 @@ set ylabel "{/Symbol c}"
 plot '01_1011_ising_model_mt0.txt' using 1:5 with line linewidth 2 title 'H = 0', \
  	 '01_1011_ising_model_mt1.txt' using 1:5 with line linewidth 2 title 'H = 0.1', \
  	 '01_1011_ising_model_mt2.txt' using 1:5 with line linewidth 2 title 'H = 0.5'
-	 
