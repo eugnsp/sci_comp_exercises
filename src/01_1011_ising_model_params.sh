@@ -5,9 +5,9 @@
 # ------------------------------
 # Problems and solutions in scientific computing by W.-H. Steeb et al.
 # Chapter 10, problem 3
-
+#
 # Generate uniform sampling points on a sphere.
-
+#
 # This file is covered by the LICENSE file in the root of this project.
 # **********************************************************************
 
