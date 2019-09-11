@@ -49,9 +49,14 @@ public:
 		return data_[row + col * rows_];
 	}
 
-	const Container& data() const
+	Type* data()
 	{
-		return data_;
+		return data_.data();
+	}
+
+	const Type* data() const
+	{
+		return data_.data();
 	}
 
 	std::size_t rows() const
@@ -64,6 +69,11 @@ public:
 		return cols_;
 	}
 
+	std::size_t size() const
+	{
+		return rows_ * cols_;
+	}
+
 	void resize(std::size_t rows, std::size_t cols)
 	{
 		rows_ = rows;
@@ -74,6 +84,13 @@ public:
 	void fill(const Type& value)
 	{
 		data_.assign(data_.size(), value);
+	}
+
+	void swap(Matrix& other)
+	{
+		std::swap(data_, other.data_);
+		std::swap(rows_, other.rows_);
+		std::swap(cols_, other.cols_);
 	}
 
 private:

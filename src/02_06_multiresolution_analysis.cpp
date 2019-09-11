@@ -18,9 +18,7 @@ This file is covered by the LICENSE file in the root of this project.
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <tuple>
 #include <type_traits>
-#include <utility>
 #include <vector>
 
 struct Haar_wavelet
@@ -67,14 +65,8 @@ bool is_pow2(T x)
 template<class Vec1, class Vec2>
 bool are_equal(const Vec1& v1, const Vec2& v2, double tol = 1e-6)
 {
-	if (v1.size() != v2.size())
-		return false;
-
-	for (std::size_t i = 0; i < v1.size(); ++i)
-		if (std::abs(v1[i] - v2[i]) > tol)
-			return false;
-
-	return true;
+	const auto eq = [tol](auto x, auto y) { return std::abs(x - y) <= tol; };
+	return std::equal(v1.begin(), v1.end(), v2.begin(), v2.end(), eq);
 }
 
 template<class Vec, typename T>
@@ -117,8 +109,9 @@ void wavelet_forward_impl(const In& in, Out& out, std::index_sequence<is...>)
 		const auto n2 = n / 2;
 		for (std::size_t k = 0; k < n2; ++k)
 		{
-			tmp[k] = ((Wavelet::forward[0][is] * out[(2 * k + is) % n]) + ...);
-			tmp[n2 + k] = ((Wavelet::forward[1][is] * out[(2 * k + is) % n]) + ...);
+			const std::size_t ks[] = {((2 * k + is) % n)...};
+			tmp[k] = ((Wavelet::forward[0][is] * out[ks[is]]) + ...);
+			tmp[n2 + k] = ((Wavelet::forward[1][is] * out[ks[is]]) + ...);
 		}
 		std::copy_n(tmp.begin(), n, out.begin());
 		n = n2;
@@ -141,10 +134,11 @@ void wavelet_backward_impl(const In& in, Out& out, std::index_sequence<is...>)
 		std::copy_n(out.begin(), j2, tmp.begin());
 		for (std::size_t k = 0; k < j; ++k)
 		{
-			out[2 * k] = ((Wavelet::backward_c[0][is] * tmp[(k + is + Wavelet::backward_shift) % j]) + ...) +
-						 ((Wavelet::backward_d[0][is] * tmp[j + (k + is + Wavelet::backward_shift) % j]) + ...);
-			out[2 * k + 1] = ((Wavelet::backward_c[1][is] * tmp[(k + is + Wavelet::backward_shift) % j]) + ...) +
-							 ((Wavelet::backward_d[1][is] * tmp[j + (k + is + Wavelet::backward_shift) % j]) + ...);
+			const std::size_t ks[] = {((k + is + Wavelet::backward_shift) % j)...};
+			out[2 * k] = ((Wavelet::backward_c[0][is] * tmp[ks[is]]) + ...) +
+						 ((Wavelet::backward_d[0][is] * tmp[j + ks[is]]) + ...);
+			out[2 * k + 1] = ((Wavelet::backward_c[1][is] * tmp[ks[is]]) + ...) +
+							 ((Wavelet::backward_d[1][is] * tmp[j + ks[is]]) + ...);
 		}
 		j = j2;
 	}
@@ -173,8 +167,11 @@ void wavelet_test(std::string file_name, double eps1, double eps2)
 	const double x_min = 0;
 	const double x_max = 1;
 
-	const auto f = [](double x) { return std::exp(-x) * std::sin(4 * M_PI * x); };
-	const auto c = fn_sample(f, n, x_min, x_max);
+	const auto fn = [](double x)
+	{
+		return std::exp(-x) * std::sin(4 * M_PI * x) + x * (1 - x) * std::sin(16 * M_PI * x);
+	};
+	const auto c = fn_sample(fn, n, x_min, x_max);
 
 	std::vector<double> d;
 	wavelet_forward<Wavelet>(c.second, d);
@@ -188,6 +185,7 @@ void wavelet_test(std::string file_name, double eps1, double eps2)
 	wavelet_backward<Wavelet>(d, c1);
 
 	std::vector<double> c2;
+	assert(eps2 > eps1);
 	zero_small_coeffs(d, eps2);
 	wavelet_backward<Wavelet>(d, c2);
 
