@@ -2,7 +2,7 @@
 
 These are various exercises in scientific computing.
 
-## Sequential
+### Sequential
 
 | SID	| PID     	| Title 							| Categories  			  										|
 |:------|:----------|:----------------------------------|:--------------------------------------------------------------|
@@ -15,13 +15,15 @@ These are various exercises in scientific computing.
 | 02	| 06		| Multiresolution analysis			| Wavelets, discrete wavelet transform							|
 | 03	| 5.2.5		| Givens QR factorization			| QR factorization, Givens rotation								|
 
-## MPI
+### MPI
 
+| SID	| PID     	| Title 							| Categories  			  										|
+|:------|:----------|:----------------------------------|:--------------------------------------------------------------|
 | 20	| EX4.4		| Matrix-matrix multiplication		| Matrix-matrix multiplication									|
 
 <!--| 20	| 4.4		| LU factorization					| LU factorization without pivoting, MPI						|-->
 
-Problem sources:
+### Problem sources:
 
 | SID     	| Source / Book name 															|
 |:----------|:------------------------------------------------------------------------------|
