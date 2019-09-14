@@ -2,8 +2,10 @@
 
 #pragma once
 #include <cassert>
+#include <cmath>
 #include <cstddef>
 #include <initializer_list>
+#include <random>
 #include <utility>
 #include <vector>
 
@@ -98,3 +100,122 @@ private:
 	std::size_t rows_ = 0;
 	std::size_t cols_ = 0;
 };
+
+template<typename T>
+void transpose(Matrix<T>& mat)
+{
+	assert(mat.rows() == mat.cols());
+	const auto n = mat.rows();
+
+	for (std::size_t row = 1; row < n; ++row)
+		for (std::size_t col = 0; col < row; ++col)
+			std::swap(mat(row, col), mat(col, row));
+}
+
+// Computes C += A * B
+template<typename T>
+void mul_add(const Matrix<T>& mat_a, const Matrix<T>& mat_b, Matrix<T>& mat_c)
+{
+	assert(mat_a.rows() == mat_c.rows());
+	assert(mat_a.cols() == mat_b.rows());
+	assert(mat_b.cols() == mat_c.cols());
+
+	for (std::size_t col = 0; col < mat_c.cols(); ++col)
+		for (std::size_t i = 0; i < mat_a.cols(); ++i)
+			for (std::size_t row = 0; row < mat_c.rows(); ++row)
+				mat_c(row, col) += mat_a(row, i) * mat_b(i, col);
+}
+
+template<typename T>
+bool is_eq(const Matrix<T>& mat_a, const Matrix<T>& mat_b, T tol = 1e-6)
+{
+	if (mat_a.rows() != mat_b.rows() || mat_a.cols() != mat_b.cols())
+		return false;
+
+	for (std::size_t col = 0; col < mat_a.cols(); ++col)
+		for (std::size_t row = 0; row < mat_a.rows(); ++row)
+			if (std::abs(mat_a(row, col) - mat_b(row, col)) > tol)
+				return false;
+
+	return true;
+}
+
+// Returns the identity matrix
+template<typename T>
+Matrix<T> id_matrix(const std::size_t rows, const std::size_t cols)
+{
+	Matrix<T> mat(rows, cols);
+	for (std::size_t col = 0; col < cols; ++col)
+		for (std::size_t row = 0; row < rows; ++row)
+			mat(row, col) = (row == col) ? T{1} : T{0};
+
+	return mat;
+}
+
+// Returns the identity matrix
+template<typename T>
+Matrix<T> id_matrix(const std::size_t size)
+{
+	return id_matrix<T>(size, size);
+}
+
+// Returns the Hilbert matrix
+template<typename T>
+Matrix<T> hilbert_matrix(const std::size_t rows, const std::size_t cols)
+{
+	Matrix<T> mat(rows, cols);
+	for (std::size_t col = 0; col < cols; ++col)
+		for (std::size_t row = 0; row < rows; ++row)
+			mat(row, col) = T{1} / (1 + row + col);
+
+	return mat;
+}
+
+// Returns the Hilbert matrix
+template<typename T>
+Matrix<T> hilbert_matrix(const std::size_t size)
+{
+	return hilbert_matrix<T>(size, size);
+}
+
+// Returns the Frank matrix
+template<typename T>
+Matrix<T> frank_matrix(const std::size_t rows, const std::size_t cols)
+{
+	Matrix<T> mat(rows, cols);
+	for (std::size_t col = 0; col < cols; ++col)
+		for (std::size_t row = 0; row < rows; ++row)
+			mat(row, col) = 1 + std::min(row, col);
+
+	return mat;
+}
+
+// Returns the Frank matrix
+template<typename T>
+Matrix<T> frank_matrix(const std::size_t size)
+{
+	return frank_matrix<T>(size, size);
+}
+
+// Returns a random matrix
+template<typename T>
+Matrix<T> random_matrix(const std::size_t rows, const std::size_t cols)
+{
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<T> dist;
+
+	Matrix<T> mat(rows, cols);
+	for (std::size_t col = 0; col < cols; ++col)
+		for (std::size_t row = 0; row < rows; ++row)
+			mat(row, col) = dist(gen);
+
+	return mat;
+}
+
+// Returns a random matrix
+template<typename T>
+Matrix<T> random_matrix(const std::size_t size)
+{
+	return random_matrix<T>(size, size);
+}

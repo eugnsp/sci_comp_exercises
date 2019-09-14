@@ -1,6 +1,6 @@
 /*********************************************************************
-MPI matrix-matrix multiplication
---------------------------------
+Matrix-matrix multiplication
+----------------------------
 Parallel algorithms by H.Casanova et al.
 Exercise 4.4
 
@@ -48,25 +48,15 @@ Extent alloc_extent()
 }
 
 template<typename T>
-void init_a_matrix(Matrix<T>& mat)
+void init_matrix(Matrix<T>& mat, std::size_t offset)
 {
-	const auto extent = alloc_extent();
 	for (std::size_t col = 0; col < mat.cols(); ++col)
 		for (std::size_t row = 0; row < mat.rows(); ++row)
-			mat(row, col) = static_cast<T>(row + col + extent.first);
+			mat(row, col) = static_cast<T>(row + col + offset);
 }
 
 template<typename T>
-void init_b_matrix(Matrix<T>& mat)
-{
-	const auto extent = alloc_extent();
-	for (std::size_t col = 0; col < mat.cols(); ++col)
-		for (std::size_t row = 0; row < mat.rows(); ++row)
-			mat(row, col) = static_cast<T>(1 + row + col + extent.first);
-}
-
-template<typename T>
-bool check_c_matrix(const Matrix<T>& mat)
+bool is_ab_product(const Matrix<T>& mat)
 {
 	const auto extent = alloc_extent();
 	const auto s_sp1 = size * (size + 1) / 2;
@@ -89,7 +79,7 @@ bool check_c_matrix(const Matrix<T>& mat)
 }
 
 template<typename M>
-void matrix_mul(Matrix<M>& a, const Matrix<M>& b, Matrix<M>& c)
+void mpi_mul_add(Matrix<M>& a, const Matrix<M>& b, Matrix<M>& c)
 {
 	const auto mpi_size = mpi_comm_size();
 	const auto mpi_rank = mpi_comm_rank();
@@ -130,9 +120,9 @@ void matrix_mul(Matrix<M>& a, const Matrix<M>& b, Matrix<M>& c)
 }
 
 template<typename T>
-std::optional<bool> check_result(const Matrix<T>& c)
+std::optional<bool> check(const Matrix<T>& c)
 {
-	const int check = check_c_matrix(c);
+	const int check = is_ab_product(c);
 	if (mpi_comm_rank() == 0)
 	{
 		std::vector<int> checks(mpi_comm_size());
@@ -164,8 +154,10 @@ int main(int argc, char* argv[])
 	// Submatrix of the matrix C
 	Matrix<M> c(size, extent.size(), 0);
 
-	init_a_matrix(a);
-	init_b_matrix(b);
+	// Initialize A and B with some fixed values, so that
+	// the correctness of the product C = AB can be easily checked
+	init_matrix(a, extent.first);
+	init_matrix(b, extent.first + 1);
 
 	if (mpi_rank == 0)
 	{
@@ -175,17 +167,20 @@ int main(int argc, char* argv[])
 		std::cout << '\n' << std::endl;
 	}
 
-	matrix_mul(a, b, c);
+	mpi_mul_add(a, b, c);
 
-	if (auto check = check_result(c); check)
+	if (const auto ch = check(c); ch)
 	{
-		if (*check)
+		if (*ch)
+		{
 			std::cout << "Matrix C = AB is correct." << std::endl;
+			return 0;
+		}
 		else
+		{
 			std::cout << "Matrix C = AB is incorrect!" << std::endl;
-
-		if (!*check)
 			return 1;
+		}
 	}
 
 	return 0;

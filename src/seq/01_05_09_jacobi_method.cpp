@@ -22,27 +22,27 @@ This file is covered by the LICENSE file in the root of this project.
 #include <vector>
 
 template<typename T>
-T off(const Matrix<T>& mat)
+T off(const Matrix<T>& m)
 {
-	assert(mat.rows() == mat.cols());
-	const auto n = mat.rows();
+	assert(m.rows() == m.cols());
+	const auto n = m.rows();
 
 	T res = 0;
 	for (std::size_t row = 0; row < n - 1; ++row)
 		for (std::size_t col = row + 1; col < n; ++col)
-			res += std::abs(mat(row, col));
+			res += std::abs(m(row, col));
 
 	return res;
 }
 
 template<typename T>
-void rotate(Matrix<T>& mat, const std::size_t row1, const std::size_t col1, const std::size_t row2,
-	const std::size_t col2, const T s, const T tau)
+void rotate(Matrix<T>& m, const std::size_t row1, const std::size_t col1, const std::size_t row2,
+	const std::size_t col2, const T cos, const T sin)
 {
-	const auto m1 = mat(row1, col1);
-	const auto m2 = mat(row2, col2);
-	mat(row1, col1) = m1 - s * (m2 + m1 * tau);
-	mat(row2, col2) = m2 + s * (m1 - m2 * tau);
+	const auto m1 = m(row1, col1);
+	const auto m2 = m(row2, col2);
+	m(row1, col1) = m1 * cos - m2 * sin;
+	m(row2, col2) = m1 * sin + m2 * cos;
 }
 
 // Finds eigenvalues and eigenvectors of a real symmetric matrix using the Jacobi method;
@@ -82,7 +82,6 @@ unsigned int jacobi_eigenpairs(
 				const auto t = std::copysign(1 / (std::abs(theta) + std::hypot(1, theta)), theta);
 				const auto cos = 1 / std::hypot(1, t);
 				const auto sin = t * cos;
-				const auto tau = sin / (1 + cos);
 				const auto h = t * mat(row, col);
 
 				vals[row] -= h;
@@ -90,14 +89,14 @@ unsigned int jacobi_eigenpairs(
 
 				mat(row, col) = 0;
 				for (std::size_t i = 0; i < row; i++)
-					rotate(mat, i, row, i, col, sin, tau);
+					rotate(mat, i, row, i, col, cos, sin);
 				for (std::size_t i = row + 1; i < col; i++)
-					rotate(mat, row, i, i, col, sin, tau);
+					rotate(mat, row, i, i, col, cos, sin);
 				for (std::size_t i = col + 1; i < n; i++)
-					rotate(mat, row, i, col, i, sin, tau);
+					rotate(mat, row, i, col, i, cos, sin);
 
 				for (std::size_t j = 0; j < n; j++)
-					rotate(vecs, j, row, j, col, sin, tau);
+					rotate(vecs, j, row, j, col, cos, sin);
 			}
 
 		if (++iter >= max_iters)
@@ -105,30 +104,6 @@ unsigned int jacobi_eigenpairs(
 	}
 
 	return iter;
-}
-
-// Returns the Hilbert matrix of the given order
-template<typename T>
-Matrix<T> hilbert_matrix(const std::size_t n)
-{
-	Matrix<T> mat(n, n);
-	for (std::size_t col = 0; col < n; ++col)
-		for (std::size_t row = 0; row < n; ++row)
-			mat(row, col) = T{1} / (1 + row + col);
-
-	return mat;
-}
-
-// Returns the Frank matrix of the given order
-template<typename T>
-Matrix<T> frank_matrix(const std::size_t n)
-{
-	Matrix<T> mat(n, n);
-	for (std::size_t col = 0; col < n; ++col)
-		for (std::size_t row = 0; row < n; ++row)
-			mat(row, col) = 1 + std::min(row, col);
-
-	return mat;
 }
 
 void test(Matrix<double> mat)

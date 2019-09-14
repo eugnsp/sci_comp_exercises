@@ -11,8 +11,10 @@ These are various exercises in scientific computing.
 | 01	| 10.03		| Uniform distribution on sphere	| Random distributions											|
 | 01	| 10.11		| Ising model						| Monte-Carlo methods, Metropolis algorithm, Ising model		|
 | 02	| 06		| Multiresolution analysis			| Wavelets, discrete wavelet transform							|
-| 20	| EX4.4		| MPI matrix-matrix multiplication	| Matrix-matrix multiplication, MPI								|
-| 20	| 4.4		| MPI LU factorization				| LU factorization without pivoting, MPI						|
+| 03	| 5.2.5		| Givens QR factorization			| QR factorization, Givens rotation								|
+| 20	| EX4.4		| Matrix-matrix multiplication		| Matrix-matrix multiplication, MPI								|
+
+<!--| 20	| 4.4		| LU factorization					| LU factorization without pivoting, MPI						|-->
 
 Problem sources:
 
@@ -20,4 +22,5 @@ Problem sources:
 |:----------|:------------------------------------------------------------------------------|
 | 01		| *Problems and solutions in scientific computing* by W.-H. Steeb et al.		|
 | 02		| *An introduction to scientific computing* by I.Danaila et al.					|
+| 03		| G.H.Golub, C.F.Van Loan. Matrix computations.									|
 | 20		| *Parallel algorithms* by H.Casanova et al.									|
