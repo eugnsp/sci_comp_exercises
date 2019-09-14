@@ -3,7 +3,7 @@
 # *********************************************************************
 # Multiresolution analysis
 # ------------------------
-# An introduction to scientific computing by I.Danaila et al.
+# I.Danaila et al. An introduction to scientific computing.
 # Chapter 6
 #
 # Implement 1D forward and backward wavelet transforms for Haar,
@@ -23,4 +23,4 @@ set ylabel 'f'
 plot '02_06_multiresolution_analysis_daubechies.txt' using 1:2 with line linewidth 2 title 'original function', \
      '02_06_multiresolution_analysis_daubechies.txt' using 1:3 with line linewidth 2 title '{/Symbol e} = .1', \
      '02_06_multiresolution_analysis_daubechies.txt' using 1:4 with line linewidth 2 title '{/Symbol e} = .5'
-    
+

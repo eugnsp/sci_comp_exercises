@@ -1,7 +1,7 @@
 /*********************************************************************
 Kahan summation algorithm
 -------------------------
-Problems and solutions in scientific computing by W.-H. Steeb et al.
+W.-H. Steeb et al. Problems and solutions in scientific computing.
 Chapter 1, problem 30
 
 Compute the sum	\sum_{i=1}^n 1/i^2 using the Kahan summation algorithm.

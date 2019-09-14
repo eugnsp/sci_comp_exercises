@@ -1,7 +1,7 @@
 /*********************************************************************
 Multiresolution analysis
 ------------------------
-An introduction to scientific computing by I.Danaila et al.
+I.Danaila et al. An introduction to scientific computing.
 Chapter 6
 
 Implement 1D forward and backward wavelet transforms for Haar,

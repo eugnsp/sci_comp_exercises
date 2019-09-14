@@ -1,7 +1,7 @@
 /*********************************************************************
 Jacobi method
 -------------
-Problems and solutions in scientific computing by W.-H. Steeb et al.
+W.-H. Steeb et al. Problems and solutions in scientific computing.
 Chapter 9, problem 23
 
 Implement the iterative Jacobi method for determining the solution

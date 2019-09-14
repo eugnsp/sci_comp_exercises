@@ -1,7 +1,7 @@
 /*********************************************************************
 Matrix-matrix multiplication
 ----------------------------
-Parallel algorithms by H.Casanova et al.
+H.Casanova, A.Legrand, Y.Robert. Parallel algorithms.
 Exercise 4.4
 
 Implement the matrix multiplication algorithm from Sec. 4.2 using MPI.

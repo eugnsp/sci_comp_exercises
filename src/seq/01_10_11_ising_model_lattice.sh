@@ -3,7 +3,7 @@
 # *********************************************************************
 # Uniform distribution on sphere
 # ------------------------------
-# Problems and solutions in scientific computing by W.-H. Steeb et al.
+# W.-H. Steeb et al. Problems and solutions in scientific computing.
 # Chapter 10, problem 3
 
 # Generate uniform sampling points on a sphere.
