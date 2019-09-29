@@ -1,8 +1,6 @@
 /*********************************************************************
 Givens QR factorization
 -----------------------
-G.H.Golub, C.F.Van Loan. Matrix computations.
-Section 5.2.5.
 
 Implement the Givens rotation method for QR factorization.
 

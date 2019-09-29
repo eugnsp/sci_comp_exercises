@@ -1,8 +1,6 @@
 /*********************************************************************
 Jacobi method
 -------------
-W.-H. Steeb et al. Problems and solutions in scientific computing.
-Chapter 5, problem 9
 
 Implement the Jacobi eigenvalue algorithm to find eigenvalues and
 eigenvectors of a real symmetric matrix.
@@ -12,6 +10,7 @@ This file is covered by the LICENSE file in the root of this project.
 
 #include "matrix.hpp"
 #include "io.hpp"
+
 #include <cassert>
 #include <cmath>
 #include <cstddef>

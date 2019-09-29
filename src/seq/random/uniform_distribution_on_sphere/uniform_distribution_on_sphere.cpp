@@ -1,8 +1,6 @@
 /*********************************************************************
-Uniform distribution on sphere
-------------------------------
-W.-H. Steeb et al. Problems and solutions in scientific computing.
-Chapter 10, problem 3
+Uniform distribution on a sphere
+--------------------------------
 
 Generate uniform sampling points on a sphere.
 
@@ -43,13 +41,15 @@ int main()
 	std::random_device rand_dev;
 	std::mt19937 rand_gen{rand_dev()};
 
-	std::ofstream file("01_1003_uniform_distribution_on_sphere.txt");
+	std::ofstream file;
+	file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+	file.open("distribution.txt");
 
 	Uniform_distr_on_sphere<double> uds;
 	for (unsigned int i = 0; i < 500; ++i)
 	{
 		const auto [x, y, z] = uds(rand_gen);
-		file << x << ' ' << y << ' ' << z << std::endl;
+		file << x << '\t' << y << '\t' << z << '\n';
 	}
 
 	return 0;

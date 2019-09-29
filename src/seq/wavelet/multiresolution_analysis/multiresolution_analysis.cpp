@@ -1,8 +1,6 @@
 /*********************************************************************
 Multiresolution analysis
 ------------------------
-I.Danaila et al. An introduction to scientific computing.
-Chapter 6
 
 Implement 1D forward and backward wavelet transforms for Haar,
 Schauder and Daubechies wavelets.
@@ -10,13 +8,13 @@ Schauder and Daubechies wavelets.
 This file is covered by the LICENSE file in the root of this project.
 **********************************************************************/
 
+#include "io.hpp"
+
 #define _USE_MATH_DEFINES
 
 #include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <fstream>
-#include <iostream>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -189,16 +187,14 @@ void wavelet_test(std::string file_name, double eps1, double eps2)
 	zero_small_coeffs(d, eps2);
 	wavelet_backward<Wavelet>(d, c2);
 
-	std::ofstream file(file_name);
-	for (std::size_t i = 0; i < n; ++i)
-		file << c.first[i] << ' ' << c.second[i] << ' ' << c1[i] << ' ' << c2[i] << std::endl;
+	write_vec(file_name, c.first, c.second, c1, c2);
 }
 
 int main()
 {
-	wavelet_test<Haar_wavelet>("02_06_multiresolution_analysis_haar.txt", .025, .25);
-	wavelet_test<Schauder_wavelet>("02_06_multiresolution_analysis_schauder.txt", .1, .5);
-	wavelet_test<Daubechies_wavelet>("02_06_multiresolution_analysis_daubechies.txt", .1, .5);
+	wavelet_test<Haar_wavelet>("haar.txt", .025, .25);
+	wavelet_test<Schauder_wavelet>("schauder.txt", .1, .5);
+	wavelet_test<Daubechies_wavelet>("daubechies.txt", .1, .5);
 
 	return 0;
 }

@@ -1,15 +1,14 @@
 /*********************************************************************
-Uniform distribution on sphere
-------------------------------
-W.-H. Steeb et al. Problems and solutions in scientific computing.
-Chapter 10, problem 3
+Ising model
+-----------
 
-Generate uniform sampling points on a sphere.
+Implement the Metropolis algorithm to simulate the 2D Ising model.
 
 This file is covered by the LICENSE file in the root of this project.
 **********************************************************************/
 
 #include "matrix.hpp"
+
 #include <cmath>
 #include <cstddef>
 #include <fstream>
@@ -194,7 +193,9 @@ private:
 
 void params_vs_temp(double field, std::string file_name)
 {
-	std::ofstream file(file_name);
+	std::ofstream file;
+	file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+	file.open(file_name);
 
 	const std::size_t lattice_size = 15;
 	const double coupling = 1;
@@ -209,8 +210,8 @@ void params_vs_temp(double field, std::string file_name)
 		lattice.sweep(10'000);
 
 		const auto p = lattice.stat_params(100'000);
-		file << temp / coupling << ' ' << p.energy / coupling << ' ' << p.magnetization << ' ' << p.sp_heat << ' '
-			 << p.susceptibility * coupling << std::endl;
+		file << temp / coupling << '\t' << p.energy / coupling << '\t' << p.magnetization << '\t'
+			<< p.sp_heat << '\t' << p.susceptibility * coupling << '\n';
 	}
 }
 
@@ -222,14 +223,14 @@ void lattice_after_sweep()
 	Ising_lattice lattice(lattice_size, temp, coupling, 0, true);
 
 	lattice.sweep(1'000);
-	lattice.write("01_1011_ising_model_lattice.txt");
+	lattice.write("lattice.txt");
 }
 
 int main()
 {
-	params_vs_temp(0, "01_1011_ising_model_mt0.txt");
-	params_vs_temp(.1, "01_1011_ising_model_mt1.txt");
-	params_vs_temp(.5, "01_1011_ising_model_mt2.txt");
+	params_vs_temp(0,  "mt0.txt");
+	params_vs_temp(.1, "mt1.txt");
+	params_vs_temp(.5, "mt2.txt");
 
 	lattice_after_sweep();
 

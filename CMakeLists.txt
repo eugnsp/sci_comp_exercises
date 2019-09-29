@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-file(GLOB CPP_FILES "src/[^-]*.cpp")
+file(GLOB_RECURSE CPP_FILES "src/seq/[^-]*.cpp")
 foreach(CPP_FILE ${CPP_FILES})
 	get_filename_component(F_NAME ${CPP_FILE} NAME_WE)
 	add_executable(${F_NAME} ${CPP_FILE})
