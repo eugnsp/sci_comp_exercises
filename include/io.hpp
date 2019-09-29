@@ -29,16 +29,6 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& mat)
 	return os;
 }
 
-template<typename T>
-std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec)
-{
-	for (auto v : vec)
-		os << v << ' ';
-	os << std::endl;
-
-	return os;
-}
-
 template<typename T, typename... Ts>
 void write_vec(std::string file_name, const std::vector<T>& vec, const std::vector<Ts>&... vecs)
 {
