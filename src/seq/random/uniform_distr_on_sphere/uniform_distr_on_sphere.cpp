@@ -7,8 +7,6 @@ Generate uniform sampling points on a sphere.
 This file is covered by the LICENSE file in the root of this project.
 **********************************************************************/
 
-#define _USE_MATH_DEFINES
-
 #include <array>
 #include <cmath>
 #include <fstream>

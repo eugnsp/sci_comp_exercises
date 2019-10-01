@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <vector>
 
-template<typename T>
+template<typename T, class Solver>
 class Laplace_solver_base
 {
 public:
@@ -32,11 +32,17 @@ public:
 
 	std::vector<T> run(unsigned int n_its)
 	{
-		std::vector<T> du;
-		du.reserve(n_its);
+		return run(n_its, [](auto) {});
+	}
 
-		do_run(n_its, du);
-		return du;
+	template<class Fn>
+	std::vector<T> run(unsigned int n_its, Fn&& fn)
+	{
+		std::vector<T> ress;
+		ress.reserve(n_its);
+
+		static_cast<Solver*>(this)->do_run(n_its, ress, fn);
+		return ress;
 	}
 
 	const Matrix<T>& solution() const
@@ -45,15 +51,12 @@ public:
 	}
 
 protected:
-	virtual void do_run(unsigned int n_its, std::vector<T>& du) = 0;
-
-protected:
 	Matrix<T> rhs_;
 	Matrix<T> sol_;
 
-	const std::size_t nx_;	// Number of free dofs along x
-	const std::size_t ny_;	// Number of free dofs along y
+	const std::size_t nx_; // Number of free dofs along x
+	const std::size_t ny_; // Number of free dofs along y
 
-	const T inv_ddx_;			// = 1 / (dx)^2
-	const T inv_ddy_;			// = 1 / (dy^2)
+	const T inv_ddx_; // = 1 / (dx)^2
+	const T inv_ddy_; // = 1 / (dy^2)
 };

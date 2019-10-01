@@ -9,6 +9,7 @@ This file is covered by the LICENSE file in the root of this project.
 
 #include "io.hpp"
 #include "matrix.hpp"
+
 #include <cassert>
 #include <cmath>
 #include <cstddef>

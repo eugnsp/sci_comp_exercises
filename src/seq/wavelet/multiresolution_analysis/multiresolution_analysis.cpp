@@ -10,8 +10,6 @@ This file is covered by the LICENSE file in the root of this project.
 
 #include "io.hpp"
 
-#define _USE_MATH_DEFINES
-
 #include <algorithm>
 #include <cassert>
 #include <cmath>
