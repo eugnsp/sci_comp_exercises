@@ -1,6 +1,7 @@
 #!/usr/bin/gnuplot
+# This file is covered by the LICENSE file in the root of this project.
 
-set terminal pngcairo size 1280,720 
+set terminal pngcairo size 1280,720
 set output 'solution.png'
 set title 'BVP solution'
 

@@ -1,4 +1,5 @@
 #!/bin/sh
+# This file is covered by the LICENSE file in the root of this project.
 
 gnuplot -persist <<-EOF
 	set terminal pngcairo size 1280,720

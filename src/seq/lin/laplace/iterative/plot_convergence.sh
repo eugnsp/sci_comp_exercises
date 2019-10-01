@@ -1,6 +1,7 @@
 #!/usr/bin/gnuplot
+# This file is covered by the LICENSE file in the root of this project.
 
-set terminal pngcairo size 1000,700 
+set terminal pngcairo size 1000,700
 set output 'convergence.png'
 set title 'Convergence of iterative methods'
 set grid

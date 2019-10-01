@@ -8,7 +8,7 @@ These are various exercises in scientific computing.
 |:--------------------------------------|:----------------------------------------------------------------------|
 | `kahan_summation.cpp`					| Kahan summation algorithm												|
 | `shift_and_subtract_division.cpp`		| Shift-and-subtract division division algorithm						|
-| `/lin/laplace/iterative`				| Laplace BVP, Jacobi method, Gauss-Seidel method, SOR method			|
+| `/lin/laplace/iterative`				| Laplace BVP, Jacobi, Gauss-Seidel, and SOR iterative methods			|
 | `/lin/given_qr_factorization`			| QR factorization, Givens rotation										|
 | `/eigen/jacobi_method.cpp`			| Matrix diagonalization, Jacobi eigenvalue algorithm					|
 | `/random/ising_model`					| 2D Ising model simulation with Metropolis Monte-Carlo algorithm		|
