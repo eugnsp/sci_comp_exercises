@@ -6,8 +6,6 @@ This file is covered by the LICENSE file in the root of this project.
 **********************************************************************/
 
 #pragma once
-#include "matrix.hpp"
-
 #include <cstddef>
 #include <fstream>
 #include <iomanip>
@@ -15,22 +13,22 @@ This file is covered by the LICENSE file in the root of this project.
 #include <string>
 #include <vector>
 
-template<typename T>
-std::ostream& operator<<(std::ostream& os, const Matrix<T>& mat)
-{
-	os << std::fixed << std::setprecision(4);
-	for (std::size_t row = 0; row < mat.rows(); ++row)
-	{
-		for (std::size_t col = 0; col < mat.cols(); ++col)
-			os << std::setw(7) << mat(row, col) << ' ';
-		os << '\n';
-	}
+// template<typename T>
+// std::ostream& operator<<(std::ostream& os, const Matrix<T>& mat)
+// {
+// 	os << std::fixed << std::setprecision(4);
+// 	for (std::size_t row = 0; row < mat.rows(); ++row)
+// 	{
+// 		for (std::size_t col = 0; col < mat.cols(); ++col)
+// 			os << std::setw(7) << mat(row, col) << ' ';
+// 		os << '\n';
+// 	}
 
-	return os;
-}
+// 	return os;
+// }
 
-template<typename T, typename... Ts>
-void write_vec(std::string file_name, const std::vector<T>& vec, const std::vector<Ts>&... vecs)
+template<class Vec, class... Vecs>
+void write_vec(std::string file_name, const Vec& vec, const Vecs&... vecs)
 {
 	assert(((vec.size() == vecs.size()) && ...));
 
@@ -46,8 +44,8 @@ void write_vec(std::string file_name, const std::vector<T>& vec, const std::vect
 	}
 }
 
-template<typename S, class X_titles, class Y_titles>
-void write_gnuplot(std::string file_name, const Matrix<S>& mat, X_titles x_titles, Y_titles y_titles)
+template<class Matrix, class X_titles, class Y_titles>
+void write_gnuplot(std::string file_name, const Matrix& mat, X_titles x_titles, Y_titles y_titles)
 {
 	std::ofstream file;
 	file.exceptions(std::ofstream::failbit | std::ofstream::badbit);

@@ -8,20 +8,18 @@ eigenvectors of a real symmetric matrix.
 This file is covered by the LICENSE file in the root of this project.
 **********************************************************************/
 
-#include "matrix.hpp"
 #include "io.hpp"
+#include <es_la/dense.hpp>
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
-#include <iomanip>
-#include <iostream>
-#include <limits>
 #include <stdexcept>
 #include <vector>
 
 template<typename T>
-T off(const Matrix<T>& m)
+T off(const es_la::Matrix_x<T>& m)
 {
 	assert(m.rows() == m.cols());
 	const auto n = m.rows();
@@ -35,7 +33,7 @@ T off(const Matrix<T>& m)
 }
 
 template<typename T>
-void rotate(Matrix<T>& m, const std::size_t row1, const std::size_t col1, const std::size_t row2,
+void rotate(es_la::Matrix_x<T>& m, const std::size_t row1, const std::size_t col1, const std::size_t row2,
 	const std::size_t col2, const T cos, const T sin)
 {
 	const auto m1 = m(row1, col1);
@@ -49,20 +47,17 @@ void rotate(Matrix<T>& m, const std::size_t row1, const std::size_t col1, const 
 // and "Numerical recipes" (W.H.Press)
 template<typename T>
 unsigned int jacobi_eigenpairs(
-	Matrix<T>& mat, Matrix<double>& vecs, std::vector<double>& vals, const double delta = 1e-8)
+	es_la::Matrix_x<T> mat, es_la::Matrix_x<T>& vecs, es_la::Vector_x<T>& vals, const T delta)
 {
 	assert(mat.rows() == mat.cols());
 	const auto n = mat.rows();
 
 	vecs.resize(n, n);
-	vals.resize(n);
+	vecs = 0;
+	vecs.diag_view() = 1;
 
-	vecs.fill(0);
-	for (std::size_t i = 0; i < n; i++)
-	{
-		vals[i] = mat(i, i);
-		vecs(i, i) = 1;
-	}
+	vals.resize(n);
+	vals = mat.diag_view();
 
 	constexpr unsigned int max_iters = 50u;
 	unsigned int iter = 1;
@@ -105,30 +100,55 @@ unsigned int jacobi_eigenpairs(
 	return iter;
 }
 
-void test(Matrix<double> mat)
+template<typename T>
+bool have_same_elements(es_la::Vector_x<double>& vec1, es_la::Vector_x<double>& vec2, const T delta)
 {
-	std::cout << "Matrix:\n" << mat << std::endl;
+	if (vec1.size() != vec2.size())
+		return false;
 
-	Matrix<double> vecs;
-	std::vector<double> vals;
-	const auto iter = jacobi_eigenpairs(mat, vecs, vals);
+	std::sort(vec1.data(), vec1.data() + vec1.size());
+	std::sort(vec2.data(), vec2.data() + vec2.size());
 
-	std::cout << "After " << iter << " ierations:\n\n";
+	return std::equal(vec1.data(), vec1.data() + vec1.size(), vec2.data(), vec2.data() + vec2.size(),
+		[delta](auto val1, auto val2) { return std::abs(val1 - val2) < delta; });
+}
 
-	std::cout << "Eigenvalues:\n" << std::fixed << std::setprecision(7);
+bool test(es_la::Matrix_x<double> mat)
+{
+	std::cout << "Matrix size: " << mat.rows() << " x " << mat.cols() << std::endl;
 
-	for (auto v : vals)
-		std::cout << v << ' ';
-	std::cout << '\n' << std::endl;
+	es_la::Matrix_x<double> vecs;
+	es_la::Vector_x<double> vals;
 
-	std::cout << "Eigenvectors:\n" << vecs << std::endl;
-	std::cout << "-------------\n" << std::endl;
+	const auto delta = 1e-10;
+	const auto iters = jacobi_eigenpairs(mat, vecs, vals, delta);
+	std::cout << "The Jacobi diagonalization took " << iters << " iterations." << std::endl;
+
+	es_la::Matrix_x<double> vals_diag(vals.size(), vals.size(), 0);
+	vals_diag.diag_view() = vals;
+	std::cout << "||M * V - V * D|| = " << norm_sup(mat * vecs - vecs * vals_diag) << '\n';
+
+	es_la::Vector_xd true_vals;
+	es_la::eigenvalues(mat, true_vals);
+
+	const auto f = have_same_elements(vals, true_vals, delta);
+	std::cout << "Eigenvalues are " << (f ? "" : "in") << "correct.\n" << std::endl;
+	return f;
 }
 
 int main()
 {
-	test(hilbert_matrix<double>(4));
-	test(frank_matrix<double>(4));
+	if (!test(es_la::hilbert_matrix<double>(5)))
+		return -1;
+	if (!test(es_la::hilbert_matrix<double>(10)))
+		return -1;
+
+	if (!test(es_la::frank_matrix<double>(5)))
+		return -1;
+	if (!test(es_la::frank_matrix<double>(10)))
+		return -1;
+	if (!test(es_la::frank_matrix<double>(20)))
+		return -1;
 
 	return 0;
 }

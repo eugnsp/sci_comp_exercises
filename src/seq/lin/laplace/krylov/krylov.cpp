@@ -9,6 +9,7 @@ This file is covered by the LICENSE file in the root of this project.
 **********************************************************************/
 
 #include "../grid.hpp"
+#include "../iterative/laplace_even_odd_sor_solver.hpp"
 #include "io.hpp"
 #include "laplace_cg_solver.hpp"
 #include "matrix.hpp"
@@ -39,7 +40,7 @@ int main()
 	const auto rhs_fn = [](double x, double y) { return std::cos(2 * x) * sin(2 * y); };
 	const auto sol_fn = [](double x, double y) { return .125 * std::cos(2 * x) * std::sin(2 * y) + .1 * y; };
 
-	const auto n_its = 200u;
+	const auto n_its = 350u;
 	Grid<double> x_grid{0., 3, 50};
 	Grid<double> y_grid{0., 3, 50};
 
@@ -51,23 +52,26 @@ int main()
 
 	std::cout << "System size: " << x_grid.n << " x " << y_grid.n << std::endl;
 
+	// Even-odd SOR
+
+	Laplace_even_odd_sor_solver<double> even_odd_sor_solver(x_grid, y_grid, rhs_fn, sol_fn);
+	const auto even_odd_sor_res = even_odd_sor_solver.run(n_its);
+	const auto& even_odd_sor_sol = even_odd_sor_solver.solution();
+
+	std::cout << "Even-odd SOR solver: du = " << norm_sup(even_odd_sor_sol - true_sol) << std::endl;
+
 	// Conjugate gradient
 
 	Laplace_cg_solver<double> cg_solver(x_grid, y_grid, rhs_fn, sol_fn);
-	const auto cg_res = cg_solver.run(n_its);
+	const auto cg_res = cg_solver.run(n_its, [&](auto it)
+	{
+		if (it < 100)
+			write_gnuplot("cg_" + std::to_string(it) + ".dat", cg_solver.solution(), x_labels, y_labels);
+	});
 	const auto& cg_sol = cg_solver.solution();
 
-	std::cout << "Conjugate gradient solver: du = " << dist_inf(cg_sol, true_sol) << std::endl;
+	std::cout << "Conjugate gradient solver: du = " << norm_sup(cg_sol - true_sol) << std::endl;
 
-	write_vec("convergence.txt", cg_res);
-
-	// Animation of conjugate gradient
-
-	Laplace_cg_solver<double> cg_anim_solver(x_grid, y_grid, rhs_fn, sol_fn);
-	cg_anim_solver.run(100, [&](auto it)
-	{;
-		write_gnuplot("cg_" + std::to_string(it) + ".dat", cg_anim_solver.solution(), x_labels, y_labels);
-	});
-
+	write_vec("convergence.txt", even_odd_sor_res, cg_res);
 	return 0;
 }

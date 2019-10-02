@@ -15,6 +15,34 @@ This file is covered by the LICENSE file in the root of this project.
 #include <vector>
 
 template<typename T>
+class Matrix;
+
+template<std::size_t start_row, std::size_t start_col, typename T>
+class Matrix_view
+{
+public:
+	using Reference = typename Matrix<T>::Reference;
+	using Const_reference = typename Matrix<T>::Const_reference;
+
+public:
+	Matrix_view(Matrix<T>& mat) : mat_(mat)
+	{}
+
+	Reference operator()(std::size_t row, std::size_t col)
+	{
+		return mat_(row + start_row, col + start_col);
+	}
+
+	Const_reference operator()(std::size_t row, std::size_t col) const
+	{
+		return mat_(row + start_row, col + start_col);
+	}
+
+private:
+	Matrix<T>& mat_;
+};
+
+template<typename T>
 class Matrix
 {
 public:
@@ -105,6 +133,12 @@ private:
 	std::size_t rows_ = 0;
 	std::size_t cols_ = 0;
 };
+
+template<std::size_t start_row, std::size_t start_col, typename T>
+auto view(Matrix<T>& mat)
+{
+	return Matrix_view<start_row, start_col, T>{mat};
+}
 
 template<typename T>
 void transpose(Matrix<T>& mat)

@@ -4,7 +4,7 @@ This file is covered by the LICENSE file in the root of this project.
 
 #pragma once
 #include "../laplace_solver_base.hpp"
-#include "matrix.hpp"
+#include <es_la/dense.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -23,33 +23,20 @@ public:
 	template<class Fn>
 	void do_run(unsigned int n_its, std::vector<T>& ress, Fn&& fn)
 	{
-		Matrix<T> temp;
+		auto sol = sol_.view(1, nx_, 1, ny_);
+		es_la::Fn_matrix a_sol(nx_, ny_, [this, &sol](auto ix, auto iy) { return mul_a(sol, ix, iy); });
 
 		const auto omega = 2 / (1 + std::sqrt(1 - rho_jacobi_sq()));
-		const auto alpha = 2 * (inv_ddx_ + inv_ddy_);
-		const auto inv_alpha = 1 / alpha;
 
 		for (auto it = 0u; it < n_its; ++it)
 		{
-			T res = 0;
-			for (std::size_t iy = 1; iy <= ny_; ++iy)
-				for (std::size_t ix = 1; ix <= nx_; ++ix)
-				{
-					const auto sx = sol_(ix - 1, iy) + sol_(ix + 1, iy);
-					const auto sy = sol_(ix, iy - 1) + sol_(ix, iy + 1);
-					const auto r = rhs_(ix - 1, iy - 1) - alpha * sol_(ix, iy) + inv_ddx_ * sx + inv_ddy_ * sy;
-					res = std::max(res, std::abs(r));
-				}
+			ress.push_back(std::log10(norm_sup(rhs_ - a_sol)));
 
-			ress.push_back(std::log10(res));
-
-			for (std::size_t iy = 1; iy <= ny_; ++iy)
-				for (std::size_t ix = 1; ix <= nx_; ++ix)
+			for (std::size_t iy = 0; iy < ny_; ++iy)
+				for (std::size_t ix = 0; ix < nx_; ++ix)
 				{
-					const auto sx = sol_(ix - 1, iy) + sol_(ix + 1, iy);
-					const auto sy = sol_(ix, iy - 1) + sol_(ix, iy + 1);
-					const auto new_sol = inv_alpha * (rhs_(ix - 1, iy - 1) + inv_ddx_ * sx + inv_ddy_ * sy);
-					sol_(ix, iy) += omega * (new_sol - sol_(ix, iy));
+					const auto new_sol = (rhs_(ix, iy) - mul_nondiag_a(sol, ix, iy)) / alpha_;
+					sol(ix, iy) += omega * (new_sol - sol(ix, iy));
 				}
 
 			fn(it);
@@ -59,18 +46,22 @@ public:
 private:
 	T rho_jacobi_sq() const
 	{
-		const auto alpha = inv_ddy_ / inv_ddx_;
+		const auto alpha = alpha_y_ / alpha_x_;
 		const auto rho = (std::cos(M_PI / nx_) + alpha * std::cos(M_PI / ny_)) / (1 + alpha);
 		return rho * rho;
 	}
 
 private:
+	using Base::mul_a;
+	using Base::mul_nondiag_a;
+
 	using Base::rhs_;
 	using Base::sol_;
 
 	using Base::nx_;
 	using Base::ny_;
 
-	using Base::inv_ddx_;
-	using Base::inv_ddy_;
+	using Base::alpha_x_;
+	using Base::alpha_y_;
+	using Base::alpha_;
 };

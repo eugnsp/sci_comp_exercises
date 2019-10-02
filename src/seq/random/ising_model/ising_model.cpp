@@ -7,7 +7,7 @@ Implement the Metropolis algorithm to simulate the 2D Ising model.
 This file is covered by the LICENSE file in the root of this project.
 **********************************************************************/
 
-#include "matrix.hpp"
+#include <es_la/dense.hpp>
 
 #include <cmath>
 #include <cstddef>
@@ -179,7 +179,7 @@ private:
 
 private:
 	const std::size_t n_;
-	Matrix<int> s_;
+	es_la::Matrix_x<int> s_;
 
 	double temp_;
 	const double coupling_;

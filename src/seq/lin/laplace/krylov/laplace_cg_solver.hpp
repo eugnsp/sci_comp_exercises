@@ -1,6 +1,6 @@
 #pragma once
 #include "../laplace_solver_base.hpp"
-#include "matrix.hpp"
+#include <es_la/dense.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -19,72 +19,47 @@ public:
 	template<class Fn>
 	void do_run(unsigned int n_its, std::vector<T>& ress, Fn&& fn)
 	{
-		Matrix<T> r(nx_, ny_);
-		Matrix<T> ap(nx_, ny_);
+		auto sol = sol_.view(1, nx_, 1, ny_);
+		es_la::Fn_matrix mul_a_sol(nx_, ny_, [this, &sol](auto ix, auto iy) { return mul_a(sol, ix, iy); });
 
-		const auto alpha = 2 * (inv_ddx_ + inv_ddy_);
-		const auto inv_alpha = 1 / alpha;
+		es_la::Matrix_x<T> pp(nx_ + 2, ny_ + 2, 0);
+		auto p = pp.view(1, nx_, 1, ny_);
+		es_la::Fn_matrix mul_a_p(nx_, ny_, [this, &p](auto ix, auto iy) { return mul_a(p, ix, iy); });
 
-		for (std::size_t iy = 1; iy <= ny_; ++iy)
-			for (std::size_t ix = 1; ix <= nx_; ++ix)
-			{
-				const auto sx = sol_(ix - 1, iy) + sol_(ix + 1, iy);
-				const auto sy = sol_(ix, iy - 1) + sol_(ix, iy + 1);
-				r(ix - 1, iy - 1) = rhs_(ix - 1, iy - 1) - alpha * sol_(ix, iy) + inv_ddx_ * sx + inv_ddy_ * sy;
-			}
+		es_la::Matrix_x<T> ap(nx_, ny_), r(nx_, ny_);
 
-		auto p = r;
+		p = r = rhs_ - mul_a_sol;
 
+		auto rr_old = dot(r, r);
 		for (auto it = 0u; it < n_its; ++it)
 		{
-			const auto r_dot_r = dot(r, r);
+			ress.push_back(std::log10(norm_sup(rhs_ - mul_a_sol)));
 
-			for (std::size_t iy = 0; iy < ny_; ++iy)
-				for (std::size_t ix = 0; ix < nx_; ++ix)
-				{
-					const auto sx = (ix == 0 ? 0 : p(ix - 1, iy)) + (ix == nx_ - 1 ? 0 : p(ix + 1, iy));
-					const auto sy = (iy == 0 ? 0 : p(ix, iy - 1)) + (iy == ny_ - 1 ? 0 : p(ix, iy + 1));
-					ap(ix, iy) = alpha * p(ix, iy) - inv_ddx_ * sx - inv_ddy_ * sy;
-				}
+			ap = mul_a_p;
 
-			T res = 0;
-			auto cg_alpha = r_dot_r / dot(p, ap);
-			for (std::size_t iy = 1; iy <= ny_; ++iy)
-				for (std::size_t ix = 1; ix <= nx_; ++ix)
-				{
-					res = std::max(res, cg_alpha * std::abs(p(ix - 1, iy - 1)));
-					sol_(ix, iy) += cg_alpha * p(ix - 1, iy - 1);
-					r(ix - 1, iy - 1) -= cg_alpha * ap(ix - 1, iy - 1);
-				}
+			const auto alpha = rr_old / dot(p, ap);
+			sol += alpha * p;
+			r -= alpha * ap;
 
-			ress.push_back(std::log10(res));
-
-			auto cg_beta = dot(r, r) / r_dot_r;
-			for (std::size_t iy = 0; iy < ny_; ++iy)
-				for (std::size_t ix = 0; ix < nx_; ++ix)
-					p(ix, iy) = r(ix, iy) + cg_beta * p(ix, iy);
+			const auto rr = dot(r, r);
+			const auto beta = rr / rr_old;
+			p = beta * p + r;
+			rr_old = rr;
 
 			fn(it);
 		}
 	}
 
 private:
-	T dot(const Matrix<T>& x, const Matrix<T>& y)
-	{
-		T dot = 0;
-		for (std::size_t iy = 0; iy < ny_; ++iy)
-			for (std::size_t ix = 0; ix < nx_; ++ix)
-				dot += x(ix, iy) * y(ix, iy);
-		return dot;
-	}
+	using Base::mul_a;
 
-private:
 	using Base::rhs_;
 	using Base::sol_;
 
 	using Base::nx_;
 	using Base::ny_;
 
-	using Base::inv_ddx_;
-	using Base::inv_ddy_;
+	using Base::alpha_x_;
+	using Base::alpha_y_;
+	using Base::alpha_;
 };

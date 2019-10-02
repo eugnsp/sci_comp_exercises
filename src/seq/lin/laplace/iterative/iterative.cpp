@@ -24,19 +24,6 @@ This file is covered by the LICENSE file in the root of this project.
 #include <string>
 #include <vector>
 
-template<typename T>
-T dist_inf(const Matrix<T>& x, const Matrix<T>& y)
-{
-	assert(x.rows() == y.rows());
-	assert(x.cols() == y.cols());
-
-	T dist = 0;
-	for (std::size_t col = 0; col < x.cols(); ++col)
-		for (std::size_t row = 0; row < x.rows(); ++row)
-			dist = std::max(dist, std::abs(x(row, col) - y(row, col)));
-	return dist;
-}
-
 int main()
 {
 	const auto rhs_fn = [](double x, double y) { return std::cos(2 * x) * sin(2 * y); };
@@ -64,15 +51,20 @@ int main()
 	});
 	const auto& jacobi_sol = jacobi_solver.solution();
 
-	std::cout << "Jacobi solver: du = " << dist_inf(jacobi_sol, true_sol) << std::endl;
+	std::cout << "Jacobi solver: du = " << norm_sup(jacobi_sol - true_sol) << std::endl;
 
 	// Gauss-Seidel
 
 	Laplace_gauss_seidel_solver<double> gauss_seidel_solver(x_grid, y_grid, rhs_fn, sol_fn);
-	const auto gauss_seidel_res = gauss_seidel_solver.run(n_its);
+	const auto gauss_seidel_res = gauss_seidel_solver.run(n_its, [&](auto it)
+	{
+		if (it < 500)
+			write_gnuplot(
+				"gauss_seidel_" + std::to_string(it) + ".dat", gauss_seidel_solver.solution(), x_labels, y_labels);
+	});
 	const auto& gauss_seidel_sol = gauss_seidel_solver.solution();
 
-	std::cout << "Gauss-Seidel solver: du = " << dist_inf(gauss_seidel_sol, true_sol) << std::endl;
+	std::cout << "Gauss-Seidel solver: du = " << norm_sup(gauss_seidel_sol - true_sol) << std::endl;
 
 	// SOR
 
@@ -84,7 +76,7 @@ int main()
 	});
 	const auto& sor_sol = sor_solver.solution();
 
-	std::cout << "SOR solver: du = " << dist_inf(sor_sol, true_sol) << std::endl;
+	std::cout << "SOR solver: du = " << norm_sup(sor_sol - true_sol) << std::endl;
 
 	// Even-odd SOR
 
@@ -92,7 +84,7 @@ int main()
 	const auto even_odd_sor_res = even_odd_sor_solver.run(n_its);
 	const auto& even_odd_sor_sol = even_odd_sor_solver.solution();
 
-	std::cout << "Even-odd SOR solver: du = " << dist_inf(even_odd_sor_sol, true_sol) << std::endl;
+	std::cout << "Even-odd SOR solver: du = " << norm_sup(even_odd_sor_sol - true_sol) << std::endl;
 
 	write_vec("convergence.txt", jacobi_res, gauss_seidel_res, sor_res, even_odd_sor_res);
 	return 0;

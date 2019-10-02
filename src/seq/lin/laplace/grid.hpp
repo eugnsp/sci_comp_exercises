@@ -6,7 +6,7 @@ This file is covered by the LICENSE file in the root of this project.
 **********************************************************************/
 
 #pragma once
-#include "matrix.hpp"
+#include <es_la/dense.hpp>
 
 #include <cstddef>
 
@@ -29,9 +29,9 @@ struct Grid
 };
 
 template<typename T, class Fn>
-Matrix<T> at_grid_pts(const Grid<T>& x, const Grid<T>& y, Fn fn)
+es_la::Matrix_x<T> at_grid_pts(const Grid<T>& x, const Grid<T>& y, Fn fn)
 {
-	Matrix<T> values;
+	es_la::Matrix_x<T> values;
 	values.resize(x.n, y.n);
 	for (std::size_t iy = 0; iy < y.n; ++iy)
 		for (std::size_t ix = 0; ix < x.n; ++ix)
