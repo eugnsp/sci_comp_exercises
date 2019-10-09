@@ -4,7 +4,7 @@ This file is covered by the LICENSE file in the root of this project.
 
 #pragma once
 #include "grid.hpp"
-#include <es_la/dense.hpp>
+#include <esl/dense.hpp>
 
 #include <cstddef>
 #include <vector>
@@ -39,7 +39,7 @@ public:
 
 	std::vector<T> run(unsigned int n_its)
 	{
-		return run(n_its, [](auto) {});
+		return run(n_its, [] {});
 	}
 
 	template<class Fn>
@@ -52,7 +52,7 @@ public:
 		return ress;
 	}
 
-	const es_la::Matrix_x<T>& solution() const
+	const esl::Matrix_x<T>& solution() const
 	{
 		return sol_;
 	}
@@ -73,8 +73,8 @@ protected:
 	}
 
 protected:
-	es_la::Matrix_x<T> rhs_;
-	es_la::Matrix_x<T> sol_;
+	esl::Matrix_x<T> rhs_;
+	esl::Matrix_x<T> sol_;
 
 	const std::size_t nx_; // Number of free dofs along x
 	const std::size_t ny_; // Number of free dofs along y

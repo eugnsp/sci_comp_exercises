@@ -4,9 +4,8 @@ This file is covered by the LICENSE file in the root of this project.
 
 #pragma once
 #include "../laplace_solver_base.hpp"
-#include <es_la/dense.hpp>
+#include <esl/dense.hpp>
 
-#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <vector>
@@ -23,18 +22,19 @@ public:
 	template<class Fn>
 	void do_run(unsigned int n_its, std::vector<T>& ress, Fn&& fn)
 	{
-		auto sol = sol_.view(1, nx_, 1, ny_);
-		es_la::Fn_matrix a_sol(nx_, ny_, [this, &sol](auto ix, auto iy) { return mul_a(sol, ix, iy); });
+		auto sol = sol_.view(1, 1, nx_, ny_);
+		const auto a_sol = [this, &sol](auto ix, auto iy) { return mul_a(sol, ix, iy); };
 
-		for (auto it = 0u; it < n_its; ++it)
+		while (n_its-- > 0)
 		{
-			ress.push_back(std::log10(norm_sup(rhs_ - a_sol)));
+			const auto res = norm_sup(rhs_ - esl::Fn_matrix(nx_, ny_, a_sol));
+			ress.push_back(std::log10(res));
 
 			for (std::size_t iy = 0; iy < ny_; ++iy)
 				for (std::size_t ix = 0; ix < nx_; ++ix)
 					sol(ix, iy) = (rhs_(ix, iy) - mul_nondiag_a(sol, ix, iy)) / alpha_;
 
-			fn(it);
+			fn();
 		}
 	}
 
@@ -48,7 +48,5 @@ private:
 	using Base::nx_;
 	using Base::ny_;
 
-	using Base::alpha_x_;
-	using Base::alpha_y_;
 	using Base::alpha_;
 };

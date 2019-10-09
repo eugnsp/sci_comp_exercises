@@ -27,7 +27,7 @@ These are various exercises in scientific computing.
 
 ## Results
 
-Generated images can be found in the corresponding directories inside the `figs` directory. Video animations can be found on the following [YouTube channel](https://www.youtube.com/channel/UCvaVjVoG0KRS9TGZaBZxfnQ?view_as=subscriber).
+Generated images can be found in the corresponding directories inside the `figs` directory. Video animations can be found on the following [YouTube channel](https://www.youtube.com/channel/UCvaVjVoG0KRS9TGZaBZxfnQ).
 
 ## How to build
 
@@ -46,7 +46,7 @@ C++17 compiler is required. Tested with GCC 8.3.0 and Clang 7.0.
 ## External dependencies
 
 * [Intel MKL](https://software.intel.com/en-us/mkl)
-* [`es_la` library](https://github.com/eugnsp/es_la)
+* [`esl` library](https://github.com/eugnsp/esl)
 * MPI library, e.g. [Intel MPI](https://software.intel.com/en-us/mpi-library)
 
 ## License

@@ -8,13 +8,30 @@ This file is covered by the LICENSE file in the root of this project.
 **********************************************************************/
 
 #include "io.hpp"
-#include "matrix.hpp"
+
+#include <esl/dense.hpp>
+#include <esl/io.hpp>
 
 #include <cassert>
 #include <cmath>
 #include <cstddef>
+#include <iomanip>
 #include <iostream>
 #include <utility>
+
+template<typename T>
+bool is_eq(const esl::Matrix_x<T>& mat_a, const esl::Matrix_x<T>& mat_b, T tol = 1e-6)
+{
+	if (mat_a.rows() != mat_b.rows() || mat_a.cols() != mat_b.cols())
+		return false;
+
+	for (std::size_t col = 0; col < mat_a.cols(); ++col)
+		for (std::size_t row = 0; row < mat_a.rows(); ++row)
+			if (std::abs(mat_a(row, col) - mat_b(row, col)) > tol)
+				return false;
+
+	return true;
+}
 
 template<typename T>
 int sign(T val)
@@ -72,7 +89,7 @@ std::pair<T, T> inv_rho(const T rho)
 }
 
 template<typename T>
-void rotate(Matrix<T>& m, const std::size_t row1, const std::size_t col1, const std::size_t row2,
+void rotate(esl::Matrix_x<T>& m, const std::size_t row1, const std::size_t col1, const std::size_t row2,
 	const std::size_t col2, const T cos, const T sin)
 {
 	const auto m1 = m(row1, col1);
@@ -85,7 +102,7 @@ void rotate(Matrix<T>& m, const std::size_t row1, const std::size_t col1, const 
 // is stored in the upper triangular part of `a`, the matrix Q can be
 // computed from the lower triangular part
 template<typename T>
-void givens_qr_factorize(Matrix<T>& qr)
+void givens_qr_factorize(esl::Matrix_x<T>& qr)
 {
 	for (std::size_t col = 0; col < qr.cols(); ++col)
 		for (std::size_t row = qr.rows() - 1; row > col; --row)
@@ -102,9 +119,9 @@ void givens_qr_factorize(Matrix<T>& qr)
 }
 
 template<typename T>
-Matrix<T> givens_qr_get_q(const Matrix<T>& qr)
+esl::Matrix_x<T> givens_qr_get_q(const esl::Matrix_x<T>& qr)
 {
-	Matrix<T> q = id_matrix<T>(qr.rows(), qr.rows());
+	esl::Matrix_x<T> q = esl::id_matrix<T>(qr.rows());
 	for (std::size_t col = 0; col < qr.cols(); ++col)
 		for (std::size_t row = qr.rows() - 1; row > col; --row)
 		{
@@ -117,9 +134,10 @@ Matrix<T> givens_qr_get_q(const Matrix<T>& qr)
 }
 
 template<typename T>
-void test(Matrix<T> a)
+void test(esl::Matrix_x<T> a)
 {
-	std::cout << "Matrix:\n" << a << std::endl;
+	std::cout << std::fixed;
+	std::cout << "Matrix:\n" << printer(a, 5) << std::endl;
 
 	auto a0 = a;
 	givens_qr_factorize(a);
@@ -130,10 +148,10 @@ void test(Matrix<T> a)
 		for (std::size_t row = col + 1; row < a.rows(); ++row)
 			a(row, col) = 0;
 
-	Matrix<T> qr(a.rows(), a.cols(), 0);
-	mul_add(q, a, qr);
-
-	std::cout << "Q:\n" << q << '\n' << "R:\n" << a << '\n' << "Q R:\n" << qr << '\n';
+	const auto qr = (q * a).eval();
+	std::cout << "Q:\n" << printer(q, 5) << std::endl;
+	std::cout << "R:\n" << printer(a, 5) << std::endl;
+	std::cout << "Q R:\n" << printer(qr, 5) << std::endl;
 
 	if (is_eq(a0, qr))
 		std::cout << "QR is correct.\n";
@@ -145,13 +163,12 @@ void test(Matrix<T> a)
 
 int main()
 {
-	test(hilbert_matrix<double>(5));
-	test(hilbert_matrix<double>(4, 3));
-	test(hilbert_matrix<double>(3, 4));
+	test(esl::hilbert_matrix<double>(5));
+	test(esl::hilbert_matrix<double>(4));
 
-	test(random_matrix<double>(4));
-	test(random_matrix<double>(5));
-	test(random_matrix<double>(6));
+	test(esl::random_real_matrix(4));
+	test(esl::random_real_matrix(5));
+	test(esl::random_real_matrix(6));
 
 	return 0;
 }

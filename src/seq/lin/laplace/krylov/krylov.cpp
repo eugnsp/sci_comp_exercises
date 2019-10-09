@@ -12,7 +12,6 @@ This file is covered by the LICENSE file in the root of this project.
 #include "../iterative/laplace_even_odd_sor_solver.hpp"
 #include "io.hpp"
 #include "laplace_cg_solver.hpp"
-#include "matrix.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -21,19 +20,6 @@ This file is covered by the LICENSE file in the root of this project.
 #include <iostream>
 #include <string>
 #include <vector>
-
-template<typename T>
-T dist_inf(const Matrix<T>& x, const Matrix<T>& y)
-{
-	assert(x.rows() == y.rows());
-	assert(x.cols() == y.cols());
-
-	T dist = 0;
-	for (std::size_t col = 0; col < x.cols(); ++col)
-		for (std::size_t row = 0; row < x.rows(); ++row)
-			dist = std::max(dist, std::abs(x(row, col) - y(row, col)));
-	return dist;
-}
 
 int main()
 {
@@ -44,15 +30,12 @@ int main()
 	Grid<double> x_grid{0., 3, 50};
 	Grid<double> y_grid{0., 3, 50};
 
-	const auto x_labels = [&x_grid](auto i) { return x_grid[i]; };
-	const auto y_labels = [&y_grid](auto i) { return y_grid[i]; };
-
 	const auto true_sol = at_grid_pts(x_grid, y_grid, sol_fn);
-	write_gnuplot("solution.dat", true_sol, x_labels, y_labels);
+	write_gnuplot("solution.dat", true_sol, x_grid, y_grid);
 
 	std::cout << "System size: " << x_grid.n << " x " << y_grid.n << std::endl;
 
-	// Even-odd SOR
+	// Even-odd SOR (as a base line)
 
 	Laplace_even_odd_sor_solver<double> even_odd_sor_solver(x_grid, y_grid, rhs_fn, sol_fn);
 	const auto even_odd_sor_res = even_odd_sor_solver.run(n_its);
@@ -63,10 +46,10 @@ int main()
 	// Conjugate gradient
 
 	Laplace_cg_solver<double> cg_solver(x_grid, y_grid, rhs_fn, sol_fn);
-	const auto cg_res = cg_solver.run(n_its, [&](auto it)
+	const auto cg_res = cg_solver.run(n_its, [&, it = 0]() mutable
 	{
 		if (it < 100)
-			write_gnuplot("cg_" + std::to_string(it) + ".dat", cg_solver.solution(), x_labels, y_labels);
+			write_gnuplot("cg_" + std::to_string(it++) + ".dat", cg_solver.solution(), x_grid, y_grid);
 	});
 	const auto& cg_sol = cg_solver.solution();
 

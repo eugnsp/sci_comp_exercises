@@ -33,21 +33,18 @@ int main()
 	Grid<double> x_grid{0., 3, 50};
 	Grid<double> y_grid{0., 3, 50};
 
-	const auto x_labels = [&x_grid](auto i) { return x_grid[i]; };
-	const auto y_labels = [&y_grid](auto i) { return y_grid[i]; };
-
 	const auto true_sol = at_grid_pts(x_grid, y_grid, sol_fn);
-	write_gnuplot("solution.dat", true_sol, x_labels, y_labels);
+	write_gnuplot("solution.dat", true_sol, x_grid, y_grid);
 
 	std::cout << "System size: " << x_grid.n << " x " << y_grid.n << std::endl;
 
 	// Jacobi
 
 	Laplace_jacobi_solver<double> jacobi_solver(x_grid, y_grid, rhs_fn, sol_fn);
-	const auto jacobi_res = jacobi_solver.run(n_its, [&](auto it)
+	const auto jacobi_res = jacobi_solver.run(n_its, [&, it = 0]() mutable
 	{
 		if (it < 1'000)
-			write_gnuplot("jacobi_" + std::to_string(it) + ".dat", jacobi_solver.solution(), x_labels, y_labels);
+			write_gnuplot("jacobi_" + std::to_string(it++) + ".dat", jacobi_solver.solution(), x_grid, y_grid);
 	});
 	const auto& jacobi_sol = jacobi_solver.solution();
 
@@ -56,11 +53,11 @@ int main()
 	// Gauss-Seidel
 
 	Laplace_gauss_seidel_solver<double> gauss_seidel_solver(x_grid, y_grid, rhs_fn, sol_fn);
-	const auto gauss_seidel_res = gauss_seidel_solver.run(n_its, [&](auto it)
+	const auto gauss_seidel_res = gauss_seidel_solver.run(n_its, [&, it = 0]() mutable
 	{
 		if (it < 500)
 			write_gnuplot(
-				"gauss_seidel_" + std::to_string(it) + ".dat", gauss_seidel_solver.solution(), x_labels, y_labels);
+				"gauss_seidel_" + std::to_string(it++) + ".dat", gauss_seidel_solver.solution(), x_grid, y_grid);
 	});
 	const auto& gauss_seidel_sol = gauss_seidel_solver.solution();
 
@@ -69,10 +66,10 @@ int main()
 	// SOR
 
 	Laplace_sor_solver<double> sor_solver(x_grid, y_grid, rhs_fn, sol_fn);
-	const auto sor_res = sor_solver.run(n_its, [&](auto it)
+	const auto sor_res = sor_solver.run(n_its, [&, it = 0]() mutable
 	{
 		if (it < 100)
-			write_gnuplot("sor_" + std::to_string(it) + ".dat", sor_solver.solution(), x_labels, y_labels);
+			write_gnuplot("sor_" + std::to_string(it++) + ".dat", sor_solver.solution(), x_grid, y_grid);
 	});
 	const auto& sor_sol = sor_solver.solution();
 

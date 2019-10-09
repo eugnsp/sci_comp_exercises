@@ -4,9 +4,8 @@ This file is covered by the LICENSE file in the root of this project.
 
 #pragma once
 #include "../laplace_solver_base.hpp"
-#include <es_la/dense.hpp>
+#include <esl/dense.hpp>
 
-#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <vector>
@@ -23,16 +22,17 @@ public:
 	template<class Fn>
 	void do_run(unsigned int n_its, std::vector<T>& ress, Fn&& fn)
 	{
-		auto sol = sol_.view(1, nx_, 1, ny_);
-		es_la::Fn_matrix nda_sol(nx_, ny_, [this, &sol](auto ix, auto iy) { return mul_nondiag_a(sol, ix, iy); });
+		auto sol = sol_.view(1, 1, nx_, ny_);
+		const auto mul_nda_sol = [this, &sol](auto ix, auto iy) { return mul_nondiag_a(sol, ix, iy); };
 
-		es_la::Matrix_x<T> temp(nx_, ny_);
-		for (auto it = 0u; it < n_its; ++it)
+		esl::Matrix_x<T> temp(nx_, ny_);
+		while (n_its-- > 0)
 		{
-			temp = (rhs_ - nda_sol) / alpha_;
-			ress.push_back(std::log10(alpha_ * norm_sup(temp - sol)));
+			temp = (rhs_ - esl::Fn_matrix(nx_, ny_, mul_nda_sol)) / alpha_;
+			const auto res = alpha_ * norm_sup(temp - sol);
+			ress.push_back(std::log10(res));
 			sol = temp;
-			fn(it);
+			fn();
 		}
 	}
 

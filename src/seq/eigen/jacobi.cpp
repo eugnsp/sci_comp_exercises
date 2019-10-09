@@ -9,7 +9,7 @@ This file is covered by the LICENSE file in the root of this project.
 **********************************************************************/
 
 #include "io.hpp"
-#include <es_la/dense.hpp>
+#include <esl/dense.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -19,7 +19,7 @@ This file is covered by the LICENSE file in the root of this project.
 #include <vector>
 
 template<typename T>
-T off(const es_la::Matrix_x<T>& m)
+T off(const esl::Matrix_x<T>& m)
 {
 	assert(m.rows() == m.cols());
 	const auto n = m.rows();
@@ -33,7 +33,7 @@ T off(const es_la::Matrix_x<T>& m)
 }
 
 template<typename T>
-void rotate(es_la::Matrix_x<T>& m, const std::size_t row1, const std::size_t col1, const std::size_t row2,
+void rotate(esl::Matrix_x<T>& m, const std::size_t row1, const std::size_t col1, const std::size_t row2,
 	const std::size_t col2, const T cos, const T sin)
 {
 	const auto m1 = m(row1, col1);
@@ -46,8 +46,7 @@ void rotate(es_la::Matrix_x<T>& m, const std::size_t row1, const std::size_t col
 // the algorithm is a simplified version of that described in "Linear algebra" (J.H.Wilkinson)
 // and "Numerical recipes" (W.H.Press)
 template<typename T>
-unsigned int jacobi_eigenpairs(
-	es_la::Matrix_x<T> mat, es_la::Matrix_x<T>& vecs, es_la::Vector_x<T>& vals, const T delta)
+unsigned int jacobi_eigenpairs(esl::Matrix_x<T> mat, esl::Matrix_x<T>& vecs, esl::Vector_x<T>& vals, const T delta)
 {
 	assert(mat.rows() == mat.cols());
 	const auto n = mat.rows();
@@ -101,7 +100,7 @@ unsigned int jacobi_eigenpairs(
 }
 
 template<typename T>
-bool have_same_elements(es_la::Vector_x<double>& vec1, es_la::Vector_x<double>& vec2, const T delta)
+bool have_same_elements(esl::Vector_x<double>& vec1, esl::Vector_x<double>& vec2, const T delta)
 {
 	if (vec1.size() != vec2.size())
 		return false;
@@ -113,23 +112,23 @@ bool have_same_elements(es_la::Vector_x<double>& vec1, es_la::Vector_x<double>& 
 		[delta](auto val1, auto val2) { return std::abs(val1 - val2) < delta; });
 }
 
-bool test(es_la::Matrix_x<double> mat)
+bool test(esl::Matrix_x<double> mat)
 {
 	std::cout << "Matrix size: " << mat.rows() << " x " << mat.cols() << std::endl;
 
-	es_la::Matrix_x<double> vecs;
-	es_la::Vector_x<double> vals;
+	esl::Matrix_x<double> vecs;
+	esl::Vector_x<double> vals;
 
 	const auto delta = 1e-10;
 	const auto iters = jacobi_eigenpairs(mat, vecs, vals, delta);
 	std::cout << "The Jacobi diagonalization took " << iters << " iterations." << std::endl;
 
-	es_la::Matrix_x<double> vals_diag(vals.size(), vals.size(), 0);
+	esl::Matrix_x<double> vals_diag(vals.size(), vals.size(), 0);
 	vals_diag.diag_view() = vals;
 	std::cout << "||M * V - V * D|| = " << norm_sup(mat * vecs - vecs * vals_diag) << '\n';
 
-	es_la::Vector_xd true_vals;
-	es_la::eigenvalues(mat, true_vals);
+	esl::Vector_xd true_vals;
+	esl::eigenvalues(mat, true_vals);
 
 	const auto f = have_same_elements(vals, true_vals, delta);
 	std::cout << "Eigenvalues are " << (f ? "" : "in") << "correct.\n" << std::endl;
@@ -138,16 +137,16 @@ bool test(es_la::Matrix_x<double> mat)
 
 int main()
 {
-	if (!test(es_la::hilbert_matrix<double>(5)))
+	if (!test(esl::hilbert_matrix<double>(5)))
 		return -1;
-	if (!test(es_la::hilbert_matrix<double>(10)))
+	if (!test(esl::hilbert_matrix<double>(10)))
 		return -1;
 
-	if (!test(es_la::frank_matrix<double>(5)))
+	if (!test(esl::frank_matrix<double>(5)))
 		return -1;
-	if (!test(es_la::frank_matrix<double>(10)))
+	if (!test(esl::frank_matrix<double>(10)))
 		return -1;
-	if (!test(es_la::frank_matrix<double>(20)))
+	if (!test(esl::frank_matrix<double>(20)))
 		return -1;
 
 	return 0;

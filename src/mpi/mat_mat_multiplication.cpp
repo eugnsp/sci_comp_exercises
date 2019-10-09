@@ -9,7 +9,7 @@ This file is covered by the LICENSE file in the root of this project.
 
 #include "io.hpp"
 #include "mpi.hpp"
-#include <es_la/dense.hpp>
+#include <esl/dense.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -47,7 +47,7 @@ Extent alloc_extent()
 }
 
 template<typename T>
-void init_matrix(es_la::Matrix_x<T>& mat, std::size_t offset)
+void init_matrix(esl::Matrix_x<T>& mat, std::size_t offset)
 {
 	for (std::size_t col = 0; col < mat.cols(); ++col)
 		for (std::size_t row = 0; row < mat.rows(); ++row)
@@ -55,7 +55,7 @@ void init_matrix(es_la::Matrix_x<T>& mat, std::size_t offset)
 }
 
 template<typename T>
-bool is_ab_product(const es_la::Matrix_x<T>& mat)
+bool is_ab_product(const esl::Matrix_x<T>& mat)
 {
 	const auto extent = alloc_extent();
 	const auto s_sp1 = size * (size + 1) / 2;
@@ -78,7 +78,7 @@ bool is_ab_product(const es_la::Matrix_x<T>& mat)
 }
 
 template<typename M>
-void mpi_mul_add(es_la::Matrix_x<M>& a, const es_la::Matrix_x<M>& b, es_la::Matrix_x<M>& c)
+void mpi_mul_add(esl::Matrix_x<M>& a, const esl::Matrix_x<M>& b, esl::Matrix_x<M>& c)
 {
 	const auto mpi_size = mpi_comm_size();
 	const auto mpi_rank = mpi_comm_rank();
@@ -86,7 +86,7 @@ void mpi_mul_add(es_la::Matrix_x<M>& a, const es_la::Matrix_x<M>& b, es_la::Matr
 	const auto next_mpi_rank = (mpi_rank + 1) % mpi_size;
 
 	// Buffer for receiving a submatrix of A from the previous processor
-	es_la::Matrix_x<M> prev_a_;
+	esl::Matrix_x<M> prev_a_;
 
 	for (unsigned int r = 0; r < mpi_size; ++r)
 	{
@@ -119,7 +119,7 @@ void mpi_mul_add(es_la::Matrix_x<M>& a, const es_la::Matrix_x<M>& b, es_la::Matr
 }
 
 template<typename T>
-std::optional<bool> check(const es_la::Matrix_x<T>& c)
+std::optional<bool> check(const esl::Matrix_x<T>& c)
 {
 	const int check = is_ab_product(c);
 	if (mpi_comm_rank() == 0)
@@ -145,13 +145,13 @@ int main(int argc, char* argv[])
 	const auto extent = alloc_extent(mpi_size, mpi_rank);
 
 	// Submatrix of the matrix A
-	es_la::Matrix_x<M> a(size, extent.size());
+	esl::Matrix_x<M> a(size, extent.size());
 
 	// Submatrix of the matrix B
-	es_la::Matrix_x<M> b(size, extent.size());
+	esl::Matrix_x<M> b(size, extent.size());
 
 	// Submatrix of the matrix C
-	es_la::Matrix_x<M> c(size, extent.size(), 0);
+	esl::Matrix_x<M> c(size, extent.size(), 0);
 
 	// Initialize A and B with some fixed values, so that
 	// the correctness of the product C = AB can be easily checked

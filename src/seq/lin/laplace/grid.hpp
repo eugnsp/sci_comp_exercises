@@ -6,7 +6,7 @@ This file is covered by the LICENSE file in the root of this project.
 **********************************************************************/
 
 #pragma once
-#include <es_la/dense.hpp>
+#include <esl/dense.hpp>
 
 #include <cstddef>
 
@@ -26,12 +26,17 @@ struct Grid
 	{
 		return min + (max - min) * i / (n - 1);
 	}
+
+	T operator()(std::size_t i) const
+	{
+		return (*this)[i];
+	}
 };
 
 template<typename T, class Fn>
-es_la::Matrix_x<T> at_grid_pts(const Grid<T>& x, const Grid<T>& y, Fn fn)
+esl::Matrix_x<T> at_grid_pts(const Grid<T>& x, const Grid<T>& y, Fn fn)
 {
-	es_la::Matrix_x<T> values;
+	esl::Matrix_x<T> values;
 	values.resize(x.n, y.n);
 	for (std::size_t iy = 0; iy < y.n; ++iy)
 		for (std::size_t ix = 0; ix < x.n; ++ix)

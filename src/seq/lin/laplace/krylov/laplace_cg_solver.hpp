@@ -1,10 +1,10 @@
 #pragma once
 #include "../laplace_solver_base.hpp"
-#include <es_la/dense.hpp>
+#include <esl/dense.hpp>
 
-#include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <utility>
 #include <vector>
 
 template<typename T>
@@ -19,34 +19,34 @@ public:
 	template<class Fn>
 	void do_run(unsigned int n_its, std::vector<T>& ress, Fn&& fn)
 	{
-		auto sol = sol_.view(1, nx_, 1, ny_);
-		es_la::Fn_matrix mul_a_sol(nx_, ny_, [this, &sol](auto ix, auto iy) { return mul_a(sol, ix, iy); });
+		auto sol = sol_.view(1, 1, nx_, ny_);
+		const auto mul_a_sol = [this, &sol](auto ix, auto iy) { return mul_a(sol, ix, iy); };
 
-		es_la::Matrix_x<T> pp(nx_ + 2, ny_ + 2, 0);
-		auto p = pp.view(1, nx_, 1, ny_);
-		es_la::Fn_matrix mul_a_p(nx_, ny_, [this, &p](auto ix, auto iy) { return mul_a(p, ix, iy); });
+		esl::Matrix_x<T> pp(nx_ + 2, ny_ + 2, 0);
+		auto p = pp.view(1, 1, nx_, ny_);
+		const auto mul_a_p = [this, &p](auto ix, auto iy) { return mul_a(p, ix, iy); };
 
-		es_la::Matrix_x<T> ap(nx_, ny_), r(nx_, ny_);
+		esl::Matrix_x<T> q(nx_, ny_), r(nx_, ny_);
+		p = r = rhs_ - esl::Fn_matrix(nx_, ny_, mul_a_sol);
 
-		p = r = rhs_ - mul_a_sol;
-
-		auto rr_old = dot(r, r);
-		for (auto it = 0u; it < n_its; ++it)
+		auto rho = dot(r, r);
+		while (n_its-- > 0)
 		{
-			ress.push_back(std::log10(norm_sup(rhs_ - mul_a_sol)));
+			// Note: due to round-off errors, res != norm_sup(r)
+			const auto res = norm_sup(rhs_ - esl::Fn_matrix(nx_, ny_, mul_a_sol));
+			ress.push_back(std::log10(res));
 
-			ap = mul_a_p;
+			q = esl::Fn_matrix(nx_, ny_, mul_a_p);
 
-			const auto alpha = rr_old / dot(p, ap);
+			const auto alpha = rho / dot(p, q);
 			sol += alpha * p;
-			r -= alpha * ap;
+			r -= alpha * q;
 
-			const auto rr = dot(r, r);
-			const auto beta = rr / rr_old;
+			const auto old_rho = std::exchange(rho, dot(r, r));
+			const auto beta = rho / old_rho;
 			p = beta * p + r;
-			rr_old = rr;
 
-			fn(it);
+			fn();
 		}
 	}
 
@@ -58,8 +58,4 @@ private:
 
 	using Base::nx_;
 	using Base::ny_;
-
-	using Base::alpha_x_;
-	using Base::alpha_y_;
-	using Base::alpha_;
 };

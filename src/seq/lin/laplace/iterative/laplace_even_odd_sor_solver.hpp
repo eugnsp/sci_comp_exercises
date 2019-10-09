@@ -4,9 +4,8 @@ This file is covered by the LICENSE file in the root of this project.
 
 #pragma once
 #include "../laplace_solver_base.hpp"
-#include <es_la/dense.hpp>
+#include <esl/dense.hpp>
 
-#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <vector>
@@ -23,15 +22,16 @@ public:
 	template<class Fn>
 	void do_run(unsigned int n_its, std::vector<T>& ress, Fn&& fn)
 	{
-		auto sol = sol_.view(1, nx_, 1, ny_);
-		es_la::Fn_matrix a_sol(nx_, ny_, [this, &sol](auto ix, auto iy) { return mul_a(sol, ix, iy); });
+		auto sol = sol_.view(1, 1, nx_, ny_);
+		const auto a_sol = [this, &sol](auto ix, auto iy) { return mul_a(sol, ix, iy); };
 
 		const auto rho_jacobi_sq_over_4 = rho_jacobi_sq() / 4;
 		T omega = 1;
 
 		for (auto it = 0u; it < n_its; ++it)
 		{
-			ress.push_back(std::log10(norm_sup(rhs_ - a_sol)));
+			const auto res = norm_sup(rhs_ - esl::Fn_matrix(nx_, ny_, a_sol));
+			ress.push_back(std::log10(res));
 
 			for (auto ix_s : {0u, 1u})
 			{
@@ -46,10 +46,10 @@ public:
 				if (it == 0 && ix_s == 1)
 					omega = 1 / (1 - 2 * rho_jacobi_sq_over_4);
 				else
-					omega = 1 / (1 - rho_jacobi_sq_over_4 * omega);
+					omega = 1 / (1 - omega * rho_jacobi_sq_over_4);
 			}
 
-			fn(it);
+			fn();
 		}
 	}
 

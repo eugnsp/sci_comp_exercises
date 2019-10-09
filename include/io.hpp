@@ -6,26 +6,13 @@ This file is covered by the LICENSE file in the root of this project.
 **********************************************************************/
 
 #pragma once
+#include <cassert>
 #include <cstddef>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
-
-// template<typename T>
-// std::ostream& operator<<(std::ostream& os, const Matrix<T>& mat)
-// {
-// 	os << std::fixed << std::setprecision(4);
-// 	for (std::size_t row = 0; row < mat.rows(); ++row)
-// 	{
-// 		for (std::size_t col = 0; col < mat.cols(); ++col)
-// 			os << std::setw(7) << mat(row, col) << ' ';
-// 		os << '\n';
-// 	}
-
-// 	return os;
-// }
 
 template<class Vec, class... Vecs>
 void write_vec(std::string file_name, const Vec& vec, const Vecs&... vecs)
