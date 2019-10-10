@@ -1,9 +1,3 @@
-[submodule "external/es_la"]
-	path = external/es_la
-	url = https://github.com/eugnsp/es_la.git
 [submodule "esl"]
 	path = esl
-	url = https://github.com/eugnsp/esl.git
-[submodule "external/esl"]
-	path = external/esl
 	url = https://github.com/eugnsp/esl.git
