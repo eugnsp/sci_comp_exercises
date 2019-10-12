@@ -4,24 +4,29 @@ These are various exercises in scientific computing.
 
 ## Contents
 
-### Sequential (`/seq`)
+### Sequential (`seq`)
 
-| Directory / File						| Description 															|
-|:--------------------------------------|:----------------------------------------------------------------------|
-| `kahan_summation.cpp`					| Kahan summation algorithm												|
-| `shift_and_subtract_division.cpp`		| Shift-and-subtract division division algorithm						|
-| `/lin/laplace/iterative`				| Laplace BVP, Jacobi, Gauss-Seidel, and SOR iterative methods			|
-| `/lin/given_qr_factorization`			| QR factorization, Givens rotation										|
-| `/eigen/jacobi.cpp`					| Matrix diagonalization, Jacobi eigenvalue algorithm					|
-| `/random/ising_model`					| 2D Ising model simulation with Metropolis Monte-Carlo algorithm		|
-| `/random/uniform_distr_on_sphere`		| Uniform distribution on sphere										|
-| `/wavelet/multiresolution_analysis`	| Wavelets, discrete wavelet transform									|
+* `basics`
+	* `ieee754`
+		* `doubles_density`: Relative density of double floating-point numbers
+		* `info`: Extract information from IEEE 754 floating-point numbers
+	* `kahan_summation`: Kahan summation algorithm
+	* `shift_and_subtract_division`: Shift-and-subtract division division algorithm
+* `lin`
+	* `laplace`
+		* `iterative`: Laplace BVP, Jacobi, Gauss-Seidel, and SOR iterative methods
+	* `given_qr_factorization`: QR factorization, Givens rotation
+* `eigen`
+	* `jacobi`: Matrix diagonalization, Jacobi eigenvalue algorithm
+* `random`
+	* `ising_model`: 2D Ising model simulation with Metropolis Monte-Carlo algorithm
+	* `uniform_distr_on_sphere`: Uniform distribution on sphere
+* `wavelet`
+	* `multiresolution_analysis`: Wavelets, discrete wavelet transform
 
-### MPI (`/mpi`)
+### MPI (`mpi`)
 
-| Directory / File						| Description 															|
-|:--------------------------------------|:----------------------------------------------------------------------|
-| `mat_mat_multiplication.cpp`			| Matrix-matrix multiplication											|
+* `mat_mat_multiplication.cpp`: Matrix-matrix multiplication
 
 <!--| 20	| 4.4		| LU factorization					| LU factorization without pivoting, MPI						|-->
 
@@ -41,7 +46,7 @@ mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=RELEASE .. && make
 ```
 
-C++17 compiler is required. Tested with GCC 8.3.0 and Clang 7.0.
+C++17 compiler is required. Tested with GCC 8.3.0.
 
 ## External dependencies
 
