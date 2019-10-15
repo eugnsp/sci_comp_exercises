@@ -9,15 +9,18 @@ These are various exercises in scientific computing.
 * `basics`
 	* `ieee754`
 		* `doubles_density`: Relative density of double floating-point numbers
-		* `info`: Extract information from IEEE 754 floating-point numbers
-	* `kahan_summation`: Kahan summation algorithm
+		* `info`: Extracting information from IEEE 754 floating-point numbers
+		* `ulps`: Number of full floating-point intervals between two numbers
+	* `summation`
+		* `exp_taylor_series`: Exponent calculation via Taylor series summation
+		* `kahan_summation`: Kahan summation algorithm
 	* `shift_and_subtract_division`: Shift-and-subtract division division algorithm
 * `lin`
 	* `laplace`
-		* `iterative`: Laplace BVP, Jacobi, Gauss-Seidel, and SOR iterative methods
-	* `given_qr_factorization`: QR factorization, Givens rotation
+		* `iterative`: Laplace BVP solution using the Jacobi, the Gauss-Seidel, and the SOR iterative methods
+	* `given_qr_factorization`: QR factorization using Givens rotation
 * `eigen`
-	* `jacobi`: Matrix diagonalization, Jacobi eigenvalue algorithm
+	* `jacobi`: Matrix diagonalization using the Jacobi eigenvalue algorithm
 * `random`
 	* `ising_model`: 2D Ising model simulation with Metropolis Monte-Carlo algorithm
 	* `uniform_distr_on_sphere`: Uniform distribution on sphere

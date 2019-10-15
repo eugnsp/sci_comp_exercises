@@ -8,6 +8,6 @@ set grid
 
 set logscale x 2
 set xlabel "d"
-set ylabel "(next(d) - d) / d"
+set ylabel "log_2 [(next(d) - d) / d]"
 
 plot 'doubles_density.txt' using 2:3 with lines linewidth 2 notitle

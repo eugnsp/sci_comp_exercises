@@ -8,16 +8,14 @@ numbers.
 This file is covered by the LICENSE file in the root of this project.
 **********************************************************************/
 
-#include <cassert>
+#include "ieee754.hpp"
 #include <climits>
 #include <cmath>
 #include <cstddef>
-#include <cstdint>
-#include <cstring>
 #include <iostream>
 #include <limits>
+#include <stdexcept>
 #include <string>
-#include <type_traits>
 
 template<typename T>
 class Binary_prn
@@ -49,70 +47,12 @@ std::ostream& operator<<(std::ostream& os, Binary_prn<T> bin)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-template<class T>
-struct Traits;
-
-template<>
-struct Traits<float>
-{
-	static_assert(std::numeric_limits<float>::is_iec559);
-
-	using Bits = std::uint32_t;
-	static constexpr std::size_t exponent_size = 8;
-	static constexpr std::size_t mantissa_size = 23;
-};
-
-template<>
-struct Traits<double>
-{
-	static_assert(std::numeric_limits<double>::is_iec559);
-
-	using Bits = std::uint64_t;
-	static constexpr std::size_t exponent_size = 11;
-	static constexpr std::size_t mantissa_size = 52;
-};
-
-template<typename T>
-using Bits = typename Traits<T>::Bits;
-
-template<typename T>
-inline constexpr auto exponent_size = Traits<T>::exponent_size;
-
-template<typename T>
-inline constexpr auto mantissa_size = Traits<T>::mantissa_size;
-
-template<typename T>
-Bits<T> bit_cast(T value)
-{
-	Bits<T> bits;
-	std::memcpy(&bits, &value, sizeof(T));
-	return bits;
-}
-
-template<typename T>
-bool sign(T value)
-{
-	return (bit_cast(value) & (Bits<T>{1} << (CHAR_BIT * sizeof(T) - 1))) != 0;
-}
-
-template<typename T>
-Bits<T> mantissa(T value)
-{
-	return (bit_cast(value)) & ((Bits<T>{1} << mantissa_size<T>) - 1);
-}
-
-template<typename T>
-Bits<T> exponent(T value)
-{
-	return (bit_cast(value) >> mantissa_size<T>) & ~(Bits<T>{1} << exponent_size<T>);
-}
-
 template<typename T>
 int classify(T value)
 {
 	const auto m = mantissa(value);
 	const auto e = exponent(value);
-	constexpr auto max_e = (Bits<T>{1} << exponent_size<T>) - 1;
+	constexpr auto max_e = exponent_mask<T> >> mantissa_size<T>;
 
 	if (e == 0)
 		return m == 0 ? FP_ZERO : FP_SUBNORMAL;
@@ -149,12 +89,15 @@ void test(T value)
 			  << "Sign     = " << (sign(value) ? 1 : 0) << '\n'
 			  << "Exponent =  " << Binary_prn{exponent(value), exponent_size<T>} << '\n'
 			  << "Mantissa = " << std::string(exponent_size<T> + 1, ' ')
-			  << Binary{mantissa(value), mantissa_size<T>} << '\n'
+			  << Binary_prn{mantissa(value), mantissa_size<T>} << '\n'
 			  << "Type     = " << classify_as_string(value) << '\n'
 			  << std::endl;
 
-	assert(sign(value) == std::signbit(value));
-	assert(classify(value) == std::fpclassify(value));
+	if (sign(value) != std::signbit(value))
+		throw std::logic_error("Bad sign bit");
+
+	if (classify(value) != std::fpclassify(value))
+		throw std::logic_error("Bad floating-point class");
 }
 
 template<typename T>
@@ -180,8 +123,17 @@ void test()
 
 int main()
 {
-	test<float>();
-	test<double>();
+	try
+	{
+		test<float>();
+		test<double>();
+	}
+	catch (std::exception& e)
+	{
+		std::cout << "Exception: " << e.what() << std::endl;
+		return 1;
+	}
 
+	std::cout << "OK." << std::endl;
 	return 0;
 }

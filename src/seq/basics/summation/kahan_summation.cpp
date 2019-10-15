@@ -49,15 +49,15 @@ int main()
 {
 	const int n = 100'000;
 
-	std::cout << std::setprecision(std::numeric_limits<float>::digits10 + 1)
+	std::cout << std::setprecision(std::numeric_limits<float>::digits10)
 			  << plain_sum(1, n, [](auto n) { return fn<float>(n); }) << '\n'
 			  << kahan_sum(1, n, [](auto n) { return fn<float>(n); }) << std::endl;
 
-	std::cout << std::setprecision(std::numeric_limits<double>::digits10 + 1)
+	std::cout << std::setprecision(std::numeric_limits<double>::digits10)
 			  << plain_sum(1, n, [](auto n) { return fn<double>(n); }) << '\n'
 			  << kahan_sum(1, n, [](auto n) { return fn<double>(n); }) << std::endl;
 
-	std::cout << std::setprecision(std::numeric_limits<long double>::digits10 + 1)
+	std::cout << std::setprecision(std::numeric_limits<long double>::digits10)
 			  << plain_sum(1, n, [](auto n) { return fn<long double>(n); }) << std::endl;
 
 	return 0;

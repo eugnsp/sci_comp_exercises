@@ -25,7 +25,7 @@ int main()
 	for (const auto d : ds)
 	{
 		const auto dn = std::nextafter(d, std::numeric_limits<double>::max());
-		density.push_back((dn - d) / d);
+		density.push_back(std::log2((dn - d) / d));
 	}
 
 	write_vec("doubles_density.txt", ds, density);
