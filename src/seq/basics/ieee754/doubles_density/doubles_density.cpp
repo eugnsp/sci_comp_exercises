@@ -1,11 +1,4 @@
-/*********************************************************************
-Doubles density
----------------
-
-Compute the relative density of double floating-point numbers.
-
-This file is covered by the LICENSE file in the root of this project.
-**********************************************************************/
+// This file is covered by the LICENSE file in the root of this project.
 
 #include "io.hpp"
 #include <cmath>

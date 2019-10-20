@@ -9,7 +9,7 @@ This file is covered by the LICENSE file in the root of this project.
 **********************************************************************/
 
 #include "../grid.hpp"
-#include "../iterative/laplace_even_odd_sor_solver.hpp"
+#include "../relaxation/laplace_even_odd_sor_solver.hpp"
 #include "io.hpp"
 #include "laplace_cg_solver.hpp"
 

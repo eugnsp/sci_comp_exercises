@@ -1,14 +1,6 @@
-/*********************************************************************
-IEEE 754
---------
+// This file is covered by the LICENSE file in the root of this project.
 
-Write functions to extract information from IEEE floating-point
-numbers.
-
-This file is covered by the LICENSE file in the root of this project.
-**********************************************************************/
-
-#include "ieee754.hpp"
+#include "../ieee754.hpp"
 #include <climits>
 #include <cmath>
 #include <cstddef>

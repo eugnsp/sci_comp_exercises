@@ -1,14 +1,6 @@
-/*********************************************************************
-IEEE 754 ULPs
--------------
+// This file is covered by the LICENSE file in the root of this project.
 
-Write a function that computes the number of full floating-point
-intervals between any two positive machine numbers.
-
-This file is covered by the LICENSE file in the root of this project.
-**********************************************************************/
-
-#include "ieee754.hpp"
+#include "../ieee754.hpp"
 #include <cassert>
 #include <climits>
 #include <cmath>

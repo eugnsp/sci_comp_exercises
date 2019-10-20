@@ -1,12 +1,4 @@
-/*********************************************************************
-Iterative methods
------------------
-
-Implement the Jacobi, the Gauss-Seidel and the SOR iterative methods
-for determining the solution of a 2D elliptic boundary value problem.
-
-This file is covered by the LICENSE file in the root of this project.
-**********************************************************************/
+// This file is covered by the LICENSE file in the root of this project.
 
 #include "../grid.hpp"
 #include "io.hpp"

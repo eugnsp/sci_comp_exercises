@@ -16,8 +16,10 @@ These are various exercises in scientific computing.
 		* `kahan_summation`: Kahan summation algorithm
 	* `shift_and_subtract_division`: Shift-and-subtract division division algorithm
 * `lin`
-	* `laplace`
-		* `iterative`: Laplace BVP solution using the Jacobi, the Gauss-Seidel, and the SOR iterative methods
+	* `laplace_2d_fd`
+		* `relaxation`: Laplace BVP solution using finite-difference discretization and the Jacobi, the Gauss-Seidel, and the SOR iterative methods
+	* `poisson_2d_fem`
+    	* `mixed`: Poisson BVP solution using mixed finite-element P0+P1 method
 	* `given_qr_factorization`: QR factorization using Givens rotation
 * `eigen`
 	* `jacobi`: Matrix diagonalization using the Jacobi eigenvalue algorithm
