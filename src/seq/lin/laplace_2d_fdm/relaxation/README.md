@@ -11,7 +11,7 @@ iterative methods for determining the solution of a 2D elliptic boundary value p
 
 in the domain <code>&Omega; = [0, 3] &times; [0, 3]</code> with the Dirichlet boundary condition
 
-<code>f(x, y) = 1/8 cos(2x) sin(2y) + 1/10 y</code> at <code>&part;&Omega;</code>.
+<code>u(x, y) = 1/8 cos(2x) sin(2y) + 1/10 y</code> at <code>&part;&Omega;</code>.
 
 ## Equation solution
 

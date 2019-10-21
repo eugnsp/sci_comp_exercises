@@ -9,11 +9,7 @@ iterative methods for determining the solution of a 2D elliptic boundary value p
 
 <code>-&Delta;u(x, y) = cos(2x) sin(2y)</code>
 
-in the domain <code>&Omega; = [0, 3] &times; [0, 3]</code> with the Dirichlet boundary condition
-
-<code>f(x, y) = 1/8 cos(2x) sin(2y) + 1/10 y</code> at <code>&part;&Omega; &cap; {(x, y) | x = 0 or x = 3}</code>
-
-and zero Neumann boundary condition at <code>&part;&Omega; &cap; {(x, y) | y = 0 or y = 3}</code>.
+in the domain <code>&Omega; = [0, 3] &times; [0, 3]</code> with the Dirichlet boundary conditions `u = 0` at <code>&part;&Omega; &cap; {(x, 0)}</code>, `u = .25` at <code>&part;&Omega; &cap; {(x, 3)}</code>, and zero Neumann boundary condition at <code>&part;&Omega; &cap; ({(0, y)} &cup; {(3, y)})</code>.
 
 ## Equation solution
 
