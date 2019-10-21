@@ -8,7 +8,7 @@ These are various exercises in scientific computing.
 
 * `basics`
 	* `ieee754`
-		* `doubles_density`: Relative density of double floating-point numbers
+		* [`doubles_density`](src/seq/basics/ieee754/doubles_density/): Relative density of double floating-point numbers
 		* `info`: Extracting information from IEEE 754 floating-point numbers
 		* `ulps`: Number of full floating-point intervals between two numbers
 	* `summation`
