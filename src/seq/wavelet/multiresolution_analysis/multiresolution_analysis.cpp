@@ -163,8 +163,7 @@ void wavelet_test(std::string file_name, double eps1, double eps2)
 	const double x_min = 0;
 	const double x_max = 1;
 
-	const auto fn = [](double x)
-	{
+	const auto fn = [](double x) {
 		return std::exp(-x) * std::sin(4 * M_PI * x) + x * (1 - x) * std::sin(16 * M_PI * x);
 	};
 	const auto c = fn_sample(fn, n, x_min, x_max);

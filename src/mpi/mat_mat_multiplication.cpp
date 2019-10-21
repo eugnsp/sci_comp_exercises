@@ -69,7 +69,8 @@ bool is_ab_product(const esl::Matrix_x<T>& mat)
 		for (std::size_t row = 0; row < mat.rows(); ++row)
 		{
 			const auto s_col = col + extent.first;
-			const auto val = static_cast<T>(sm1_s_sp1 + s_sm1 * s_col + s_sp1 * row + size * row * s_col);
+			const auto val =
+				static_cast<T>(sm1_s_sp1 + s_sm1 * s_col + s_sp1 * row + size * row * s_col);
 			if (mat(row, col) != val)
 				return false;
 		}

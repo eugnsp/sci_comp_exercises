@@ -38,8 +38,7 @@ void write_gnuplot(std::string file_name, const Matrix& mat, X_titles x_titles, 
 	file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
 	file.open(file_name, std::ofstream::binary);
 
-	const auto write = [&file](auto v)
-	{
+	const auto write = [&file](auto v) {
 		const auto val = static_cast<float>(v);
 		file.write(reinterpret_cast<const char*>(&val), sizeof(float));
 	};

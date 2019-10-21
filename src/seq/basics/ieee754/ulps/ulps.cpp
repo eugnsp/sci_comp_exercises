@@ -54,9 +54,8 @@ template<typename T>
 void test(const T x, const T y)
 {
 	const auto nu = ulps(x, y);
-	std::cout << '[' << x << ", " << y << "]: " << nu
-			  << " (" << (100. * nu / n_numbers<T>()) << "%)"
-			  << std::endl;
+	std::cout << '[' << x << ", " << y << "]: " << nu << " (" << (100. * nu / n_numbers<T>())
+			  << "%)" << std::endl;
 
 	if (ulps(x, y) != ulps_bf(x, y))
 		throw std::logic_error("Bad number of ULPs");

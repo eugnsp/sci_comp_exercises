@@ -61,7 +61,7 @@ private:
 	using Base::nx_;
 	using Base::ny_;
 
+	using Base::alpha_;
 	using Base::alpha_x_;
 	using Base::alpha_y_;
-	using Base::alpha_;
 };

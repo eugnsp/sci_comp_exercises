@@ -15,8 +15,8 @@ class Laplace_solver_base
 public:
 	template<class Rhs_fn, class Bnd_fn>
 	Laplace_solver_base(const Grid<T>& x, const Grid<T>& y, Rhs_fn rhs_fn, Bnd_fn bnd_fn) :
-		nx_(x.n - 2), ny_(y.n - 2),
-		alpha_x_(1 / (x.dx() * x.dx())), alpha_y_(1 / (y.dx() * y.dx())), alpha_(2 * (alpha_x_ + alpha_y_))
+		nx_(x.n - 2), ny_(y.n - 2), alpha_x_(1 / (x.dx() * x.dx())),
+		alpha_y_(1 / (y.dx() * y.dx())), alpha_(2 * (alpha_x_ + alpha_y_))
 	{
 		const Grid<T> x_internal{x[1], x[nx_], nx_};
 		const Grid<T> y_internal{y[1], y[ny_], ny_};

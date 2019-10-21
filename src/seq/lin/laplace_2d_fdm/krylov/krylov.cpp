@@ -24,7 +24,9 @@ This file is covered by the LICENSE file in the root of this project.
 int main()
 {
 	const auto rhs_fn = [](double x, double y) { return std::cos(2 * x) * sin(2 * y); };
-	const auto sol_fn = [](double x, double y) { return .125 * std::cos(2 * x) * std::sin(2 * y) + .1 * y; };
+	const auto sol_fn = [](double x, double y) {
+		return .125 * std::cos(2 * x) * std::sin(2 * y) + .1 * y;
+	};
 
 	const auto n_its = 350u;
 	Grid<double> x_grid{0., 3, 50};
@@ -46,10 +48,10 @@ int main()
 	// Conjugate gradient
 
 	Laplace_cg_solver<double> cg_solver(x_grid, y_grid, rhs_fn, sol_fn);
-	const auto cg_res = cg_solver.run(n_its, [&, it = 0]() mutable
-	{
+	const auto cg_res = cg_solver.run(n_its, [&, it = 0]() mutable {
 		if (it < 100)
-			write_gnuplot("cg_" + std::to_string(it++) + ".dat", cg_solver.solution(), x_grid, y_grid);
+			write_gnuplot(
+				"cg_" + std::to_string(it++) + ".dat", cg_solver.solution(), x_grid, y_grid);
 	});
 	const auto& cg_sol = cg_solver.solution();
 

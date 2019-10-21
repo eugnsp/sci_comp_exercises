@@ -42,10 +42,10 @@ template<typename T>
 inline constexpr auto sign_mask = Bits<T>{1} << (exponent_size<T> + mantissa_size<T>);
 
 template<typename T>
-inline constexpr auto exponent_mask = ((Bits<T>{1} << exponent_size<T>) - 1) << mantissa_size<T>;
+inline constexpr auto exponent_mask = ((Bits<T>{1} << exponent_size<T>)-1) << mantissa_size<T>;
 
 template<typename T>
-inline constexpr auto mantissa_mask = (Bits<T>{1} << mantissa_size<T>) - 1;
+inline constexpr auto mantissa_mask = (Bits<T>{1} << mantissa_size<T>)-1;
 
 template<typename T>
 Bits<T> bit_cast(T value)
@@ -76,7 +76,7 @@ Bits<T> exponent(T value)
 template<typename T>
 std::size_t n_normals()
 {
-	constexpr auto n_exponents = (exponent_mask<T> >> mantissa_size<T>) + 1;
+	constexpr auto n_exponents = (exponent_mask<T> >> mantissa_size<T>)+1;
 	constexpr auto n_mantissas = mantissa_mask<T> + 1;
 	return 2 * (n_exponents - 2) * n_mantissas;
 }
@@ -91,7 +91,7 @@ std::size_t n_subnormals()
 template<typename T>
 std::size_t n_numbers()
 {
-	constexpr auto n_exponents = (exponent_mask<T> >> mantissa_size<T>) + 1;
+	constexpr auto n_exponents = (exponent_mask<T> >> mantissa_size<T>)+1;
 	constexpr auto n_mantissas = mantissa_mask<T> + 1;
 	return 2 * n_mantissas * (n_exponents - 1);
 }

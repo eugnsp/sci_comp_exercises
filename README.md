@@ -51,12 +51,12 @@ mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=RELEASE .. && make
 ```
 
-C++17 compiler is required. Tested with GCC 8.3.0.
+C++17/C++20 compiler is required. Tested with GCC 8.3.0.
 
 ## External dependencies
 
 * [Intel MKL](https://software.intel.com/en-us/mkl)
-* [`esl` library](https://github.com/eugnsp/esl)
+* [`eslib` library](https://github.com/eugnsp/eslib)
 * MPI library, e.g. [Intel MPI](https://software.intel.com/en-us/mpi-library)
 
 ## License

@@ -27,8 +27,10 @@ public:
 	};
 
 public:
-	Ising_lattice(std::size_t n, double temp, double coupling, double field, bool rand_init = true) :
-		n_(n), s_(n, n), temp_(temp), coupling_(coupling), field_(field), rand_gen_(rand_dev_()),
+	Ising_lattice(
+		std::size_t n, double temp, double coupling, double field, bool rand_init = true) :
+		n_(n),
+		s_(n, n), temp_(temp), coupling_(coupling), field_(field), rand_gen_(rand_dev_()),
 		rand_n_distr_(0, n_ - 1)
 	{
 		init_spins(rand_init);
@@ -52,8 +54,7 @@ public:
 		auto magn = total_magnetization();
 		std::size_t i = 1;
 
-		sweep(n, [&](auto d_en_magn)
-		{
+		sweep(n, [&](auto d_en_magn) {
 			en += d_en_magn.first;
 			magn += d_en_magn.second;
 
@@ -204,7 +205,7 @@ void params_vs_temp(double field, std::string file_name)
 
 		const auto p = lattice.stat_params(100'000);
 		file << temp / coupling << '\t' << p.energy / coupling << '\t' << p.magnetization << '\t'
-			<< p.sp_heat << '\t' << p.susceptibility * coupling << '\n';
+			 << p.sp_heat << '\t' << p.susceptibility * coupling << '\n';
 	}
 }
 
@@ -221,7 +222,7 @@ void lattice_after_sweep()
 
 int main()
 {
-	params_vs_temp(0,  "mt0.txt");
+	params_vs_temp(0, "mt0.txt");
 	params_vs_temp(.1, "mt1.txt");
 	params_vs_temp(.5, "mt2.txt");
 

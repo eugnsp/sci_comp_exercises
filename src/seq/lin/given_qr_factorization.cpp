@@ -89,8 +89,8 @@ std::pair<T, T> inv_rho(const T rho)
 }
 
 template<typename T>
-void rotate(esl::Matrix_x<T>& m, const std::size_t row1, const std::size_t col1, const std::size_t row2,
-	const std::size_t col2, const T cos, const T sin)
+void rotate(esl::Matrix_x<T>& m, const std::size_t row1, const std::size_t col1,
+	const std::size_t row2, const std::size_t col2, const T cos, const T sin)
 {
 	const auto m1 = m(row1, col1);
 	const auto m2 = m(row2, col2);
