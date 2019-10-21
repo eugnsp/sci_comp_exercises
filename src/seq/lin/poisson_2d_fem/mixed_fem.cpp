@@ -1,9 +1,7 @@
 // This file is covered by the LICENSE file in the root of this project.
 
-#include <esf/dof/tools.hpp>
 #include <esf/matrix_based.hpp>
 #include <esf/mesh/io.hpp>
-#include <esf/quadr/quadr.hpp>
 #include <esl/sparse.hpp>
 #include <esl/sparse/solver/pardiso_solver.hpp>
 
@@ -44,19 +42,21 @@ private:
 	static auto a_matrix(const esf::Mesh2::Cell_view& cell, double scale)
 	{
 		using Quadr = esf::Quadr<Var1::Element::order - 1 + Var2::Element::order, 2>;
-		const auto grads = esf::gradients<Var1::Element, Quadr>(inv_transp_jacobian(cell));
+		auto grads = esf::gradients<Var1::Element, Quadr>(inv_transp_jacobian(cell));
+		grads *= scale;
 
 		constexpr auto n_dofs1 = Var1::Element::total_face_dofs;
 		constexpr auto n_dofs2 = Var2::Element::total_face_dofs;
-		esl::Matrix<esl::Vector_2d, n_dofs1, n_dofs2> mat;
-		for (std::size_t i = 0; i < n_dofs1; ++i)
-			for (std::size_t j = 0; j < n_dofs2; ++j)
-				mat(i, j) = Quadr::sum([i, j, &grads, scale](auto iq) {
-					constexpr auto basis = esf::Element_quadr<Var2::Element, Quadr>::basis();
-					return scale * basis(iq, j) * grads(iq, i);
-				});
 
-		return mat;
+		return esl::make_matrix<n_dofs1, n_dofs2>(
+			[&grads](std::size_t row, std::size_t col)
+			{
+				return Quadr::sum([row, col, &grads](auto iq)
+				{
+					constexpr auto basis = esf::Element_quadr<Var2::Element, Quadr>::basis();
+					return basis(iq, col) * grads(iq, row);
+				}).eval();
+			});
 	}
 
 	virtual void assemble() override
@@ -67,7 +67,8 @@ private:
 
 	void assemble(const esf::Mesh2::Cell_view& cell)
 	{
-		const auto rhs_fn = [&cell](auto quadr_point_index) {
+		const auto rhs_fn = [&cell](auto quadr_point_index)
+		{
 			auto pt = esf::point(quadr_point_index, cell);
 			return std::cos(2 * pt.x()) * std::sin(2 * pt.y());
 		};

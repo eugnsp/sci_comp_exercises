@@ -1,12 +1,4 @@
-/*********************************************************************
-Jacobi method
--------------
-
-Implement the Jacobi eigenvalue algorithm to find eigenvalues and
-eigenvectors of a real symmetric matrix.
-
-This file is covered by the LICENSE file in the root of this project.
-**********************************************************************/
+// This file is covered by the LICENSE file in the root of this project.
 
 #include "io.hpp"
 #include <esl/dense.hpp>

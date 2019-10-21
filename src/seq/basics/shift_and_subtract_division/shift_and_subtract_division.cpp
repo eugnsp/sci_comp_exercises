@@ -1,11 +1,4 @@
-/*********************************************************************
-Shift-and-subtract division
----------------------------
-
-Implement shift-and-subtract division algorithm for unsigned integers.
-
-This file is covered by the LICENSE file in the root of this project.
-**********************************************************************/
+// This file is covered by the LICENSE file in the root of this project.
 
 #include <cassert>
 #include <climits>

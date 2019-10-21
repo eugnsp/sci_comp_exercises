@@ -1,12 +1,4 @@
-/*********************************************************************
-Multiresolution analysis
-------------------------
-
-Implement 1D forward and backward wavelet transforms for Haar,
-Schauder and Daubechies wavelets.
-
-This file is covered by the LICENSE file in the root of this project.
-**********************************************************************/
+// This file is covered by the LICENSE file in the root of this project.
 
 #include "io.hpp"
 

@@ -1,11 +1,4 @@
-/*********************************************************************
-Kahan summation algorithm
--------------------------
-
-Compute the sum	\sum_{i=1}^n 1/i^2 using the Kahan summation algorithm.
-
-This file is covered by the LICENSE file in the root of this project.
-**********************************************************************/
+// This file is covered by the LICENSE file in the root of this project.
 
 #include <iomanip>
 #include <iostream>

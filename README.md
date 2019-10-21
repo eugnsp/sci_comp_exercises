@@ -12,21 +12,21 @@ These are various exercises in scientific computing.
 		* [`info`](src/seq/basics/ieee754/info/): Extracting information from IEEE 754 floating-point numbers
 		* [`ulps`](src/seq/basics/ieee754/ulps/): Number of full floating-point intervals between two numbers
 	* `summation`
-		* `exp_taylor_series`: Exponent calculation via Taylor series summation
-		* `kahan_summation`: Kahan summation algorithm
-	* `shift_and_subtract_division`: Shift-and-subtract division division algorithm
+		* [`exp_taylor_series`](src/seq/basics/summation/exp_taylor_series/): Exponent calculation via Taylor series summation
+		* [`kahan_summation`](src/seq/basics/summation/kahan_summation/): Kahan summation algorithm
+	* [`shift_and_subtract_division`](src/seq/basics/shift_and_subtract_division/): Shift-and-subtract division division algorithm
 * `lin`
 	* `laplace_2d_fdm`
 		* [`relaxation`](src/seq/lin/laplace_2d_fdm/relaxation/): Laplace BVP solution using finite-difference discretization and the Jacobi, the Gauss-Seidel, and the SOR iterative methods
 	* [`poisson_2d_fem`](src/seq/lin/poisson_2d_fem/): Poisson BVP solution using mixed finite-element P0+P1 method
-	* `given_qr_factorization`: QR factorization using Givens rotation
+	* [`given_qr_factorization`](src/seq/lin/given_qr_factorization/): QR factorization using Givens rotation
 * `eigen`
-	* `jacobi`: Matrix diagonalization using the Jacobi eigenvalue algorithm
+	* [`jacobi`](src/seq/eigen/jacobi/): Matrix diagonalization using the Jacobi eigenvalue algorithm
 * `random`
-	* `ising_model`: 2D Ising model simulation with Metropolis Monte-Carlo algorithm
-	* `uniform_distr_on_sphere`: Uniform distribution on sphere
+	* [`ising_model`](src/seq/random/ising_model/): 2D Ising model simulation with Metropolis Monte-Carlo algorithm
+	* [`uniform_distr_on_sphere`](src/seq/random/uniform_distr_on_sphere/): Uniform distribution on sphere
 * `wavelet`
-	* `multiresolution_analysis`: Wavelets, discrete wavelet transform
+	* [`multiresolution_analysis`](src/seq/wavelet/multiresolution_analysis/): Wavelets, discrete wavelet transform
 
 ### MPI (`mpi`)
 

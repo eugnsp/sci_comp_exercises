@@ -1,11 +1,4 @@
-/*********************************************************************
-Uniform distribution on a sphere
---------------------------------
-
-Generate uniform sampling points on a sphere.
-
-This file is covered by the LICENSE file in the root of this project.
-**********************************************************************/
+// This file is covered by the LICENSE file in the root of this project.
 
 #include <array>
 #include <cmath>

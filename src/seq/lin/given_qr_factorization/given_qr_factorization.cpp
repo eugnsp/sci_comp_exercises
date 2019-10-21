@@ -1,11 +1,4 @@
-/*********************************************************************
-Givens QR factorization
------------------------
-
-Implement the Givens rotation method for QR factorization.
-
-This file is covered by the LICENSE file in the root of this project.
-**********************************************************************/
+// This file is covered by the LICENSE file in the root of this project.
 
 #include "io.hpp"
 

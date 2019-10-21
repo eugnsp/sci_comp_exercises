@@ -1,11 +1,4 @@
-/*********************************************************************
-Exponent Taylor series
-----------------------
-
-Write a function to calculate exp(x) using its Taylor series expansion.
-
-This file is covered by the LICENSE file in the root of this project.
-**********************************************************************/
+// This file is covered by the LICENSE file in the root of this project.
 
 #include "io.hpp"
 #include <cmath>

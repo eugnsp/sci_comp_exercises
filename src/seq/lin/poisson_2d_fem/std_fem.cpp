@@ -1,6 +1,5 @@
 // This file is covered by the LICENSE file in the root of this project.
 
-#include <esf/dof/tools.hpp>
 #include <esf/matrix_based.hpp>
 #include <esf/mesh/io.hpp>
 #include <esl/sparse.hpp>
@@ -48,7 +47,8 @@ private:
 
 	void assemble(const esf::Mesh2::Cell_view& cell)
 	{
-		const auto rhs_fn = [&cell](auto quadr_point_index) {
+		const auto rhs_fn = [&cell](auto quadr_point_index)
+		{
 			auto pt = esf::point(quadr_point_index, cell);
 			return std::cos(2 * pt.x()) * std::sin(2 * pt.y());
 		};
