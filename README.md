@@ -9,17 +9,16 @@ These are various exercises in scientific computing.
 * `basics`
 	* `ieee754`
 		* [`doubles_density`](src/seq/basics/ieee754/doubles_density/): Relative density of double floating-point numbers
-		* `info`: Extracting information from IEEE 754 floating-point numbers
-		* `ulps`: Number of full floating-point intervals between two numbers
+		* [`info`](src/seq/basics/ieee754/info/): Extracting information from IEEE 754 floating-point numbers
+		* [`ulps`](src/seq/basics/ieee754/ulps/): Number of full floating-point intervals between two numbers
 	* `summation`
 		* `exp_taylor_series`: Exponent calculation via Taylor series summation
 		* `kahan_summation`: Kahan summation algorithm
 	* `shift_and_subtract_division`: Shift-and-subtract division division algorithm
 * `lin`
-	* `laplace_2d_fd`
-		* `relaxation`: Laplace BVP solution using finite-difference discretization and the Jacobi, the Gauss-Seidel, and the SOR iterative methods
-	* `poisson_2d_fem`
-    	* `mixed`: Poisson BVP solution using mixed finite-element P0+P1 method
+	* `laplace_2d_fdm`
+		* [`relaxation`](src/seq/lin/laplace_2d_fdm/relaxation/): Laplace BVP solution using finite-difference discretization and the Jacobi, the Gauss-Seidel, and the SOR iterative methods
+	* [`poisson_2d_fem`](src/seq/lin/poisson_2d_fem/): Poisson BVP solution using mixed finite-element P0+P1 method
 	* `given_qr_factorization`: QR factorization using Givens rotation
 * `eigen`
 	* `jacobi`: Matrix diagonalization using the Jacobi eigenvalue algorithm
