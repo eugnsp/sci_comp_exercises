@@ -20,7 +20,7 @@ public:
 	{
 		const Grid<T> x_internal{x[1], x[nx_], nx_};
 		const Grid<T> y_internal{y[1], y[ny_], ny_};
-		rhs_ = at_grid_pts(x_internal, y_internal, rhs_fn);
+		rhs_ = fn_sample(x_internal, y_internal, rhs_fn);
 
 		sol_.resize(x.n, y.n);
 		sol_ = 0;

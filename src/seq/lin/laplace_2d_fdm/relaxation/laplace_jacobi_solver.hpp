@@ -23,8 +23,10 @@ public:
 	void do_run(unsigned int n_its, std::vector<T>& ress, Fn&& fn)
 	{
 		auto sol = sol_.view(1, 1, nx_, ny_);
-		const auto mul_nda_sol = [this, &sol](
-									 auto ix, auto iy) { return mul_nondiag_a(sol, ix, iy); };
+		const auto mul_nda_sol = [this, &sol](auto ix, auto iy)
+		{
+			return mul_nondiag_a(sol, ix, iy);
+		};
 
 		esl::Matrix_x<T> temp(nx_, ny_);
 		while (n_its-- > 0)

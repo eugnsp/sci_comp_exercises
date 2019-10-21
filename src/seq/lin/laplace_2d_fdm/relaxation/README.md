@@ -1,11 +1,6 @@
 # Relaxation methods
 
-Implement
-- the Jacobi,
-- the Gauss-Seidel, and
-- the SOR
-
-iterative methods for determining the solution of a 2D elliptic boundary value problem
+Implement the Jacobi, the Gauss-Seidel, and the SOR iterative methods to find the solution of a model 2D elliptic boundary value problem
 
 <code>-&Delta;u(x, y) = cos(2x) sin(2y)</code>
 

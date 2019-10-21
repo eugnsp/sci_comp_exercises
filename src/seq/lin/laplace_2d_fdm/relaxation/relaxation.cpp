@@ -27,7 +27,7 @@ int main()
 	Grid<double> x_grid{0., 3, 50};
 	Grid<double> y_grid{0., 3, 50};
 
-	const auto true_sol = at_grid_pts(x_grid, y_grid, sol_fn);
+	const auto true_sol = fn_sample(x_grid, y_grid, sol_fn);
 	write_gnuplot("solution.dat", true_sol, x_grid, y_grid);
 
 	std::cout << "System size: " << x_grid.n << " x " << y_grid.n << std::endl;
