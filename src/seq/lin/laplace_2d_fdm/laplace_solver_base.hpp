@@ -9,14 +9,22 @@ This file is covered by the LICENSE file in the root of this project.
 #include <cstddef>
 #include <vector>
 
-template<typename T, class Solver>
+template<typename T,
+		 class    Solver>
 class Laplace_solver_base
 {
 public:
-	template<class Rhs_fn, class Bnd_fn>
-	Laplace_solver_base(const Grid<T>& x, const Grid<T>& y, Rhs_fn rhs_fn, Bnd_fn bnd_fn) :
-		nx_(x.n - 2), ny_(y.n - 2), alpha_x_(1 / (x.dx() * x.dx())),
-		alpha_y_(1 / (y.dx() * y.dx())), alpha_(2 * (alpha_x_ + alpha_y_))
+	template<class Rhs_fn,
+			 class Bnd_fn>
+	Laplace_solver_base(const Grid<T>& x,
+						const Grid<T>& y,
+						Rhs_fn 		   rhs_fn,
+						Bnd_fn 		   bnd_fn) :
+		nx_(x.n - 2),
+		ny_(y.n - 2),
+		alpha_x_(1 / (x.dx() * x.dx())),
+		alpha_y_(1 / (y.dx() * y.dx())),
+		alpha_(2 * (alpha_x_ + alpha_y_))
 	{
 		const Grid<T> x_internal{x[1], x[nx_], nx_};
 		const Grid<T> y_internal{y[1], y[ny_], ny_};
@@ -43,7 +51,8 @@ public:
 	}
 
 	template<class Fn>
-	std::vector<T> run(unsigned int n_its, Fn&& fn)
+	std::vector<T> run(unsigned int n_its,
+					   Fn&&			fn)
 	{
 		std::vector<T> ress;
 		ress.reserve(n_its);
@@ -59,7 +68,9 @@ public:
 
 protected:
 	template<class Matrix>
-	T mul_nondiag_a(const Matrix& mat, std::size_t ix, std::size_t iy) const
+	T mul_nondiag_a(const Matrix& mat,
+					std::size_t   ix,
+					std::size_t   iy) const
 	{
 		const auto sx = mat(ix - 1, iy) + mat(ix + 1, iy);
 		const auto sy = mat(ix, iy - 1) + mat(ix, iy + 1);
@@ -67,7 +78,9 @@ protected:
 	}
 
 	template<class Matrix>
-	T mul_a(const Matrix& mat, std::size_t ix, std::size_t iy) const
+	T mul_a(const Matrix& mat,
+			std::size_t   ix,
+			std::size_t   iy) const
 	{
 		return alpha_ * mat(ix, iy) + mul_nondiag_a(mat, ix, iy);
 	}

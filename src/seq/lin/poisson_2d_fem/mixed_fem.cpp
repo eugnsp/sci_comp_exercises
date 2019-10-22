@@ -10,50 +10,44 @@
 #include <exception>
 #include <iostream>
 
-constexpr std::size_t element_order = 1;
-
-using Bc1 = esf::Uniform_boundary_cond<esf::Lagrange<element_order>>;
-using Var1 = esf::Var<esf::Lagrange<element_order>, 1, Bc1, Bc1>;
-using Var2 = esf::Var<esf::Discontinuous_lagrange<element_order - 1>, 2>;
-using System = esf::System<esf::Var_list<Var1, Var2>, esf::Dof_mapper>;
-
-using Sp_solver = esl::Pardiso_solver<esl::Csr_matrix<double, esl::Structural_symmetric>>;
-
+template<
+	class System,
+	class Sp_solver>
 class Solver : public esf::Matrix_based_solver<System, Sp_solver>
 {
 private:
 	using Base = esf::Matrix_based_solver<System, Sp_solver>;
 
 public:
-	Solver(const esf::Mesh2& mesh) : Base(mesh)
+	Solver(const esf::Mesh2& mesh)
+	:	Base(mesh)
 	{
 		const auto br = mesh.bounding_rect();
 		const esf::Linestring bnd1{br.bottom_left(), br.top_left()};
 		const esf::Linestring bnd2{br.bottom_right(), br.top_right()};
 
-		system().variable<0>().set_bnd_cond<0>(mesh, bnd1, 0);
-		system().variable<0>().set_bnd_cond<1>(mesh, bnd2, .25);
+		system().template variable<0>().template set_bnd_cond<0>(mesh, bnd1, 0);
+		system().template variable<0>().template set_bnd_cond<1>(mesh, bnd2, .25);
 
 		init();
 		compute_and_set_sparsity_pattern(system(), matrix_);
 	}
 
 private:
-	static auto a_matrix(const esf::Mesh2::Cell_view& cell, double scale)
+	static auto a_matrix(
+		const esf::Mesh2::Cell_view& cell,
+		const double 				 scale)
 	{
-		using Quadr = esf::Quadr<Var1::Element::order - 1 + Var2::Element::order, 2>;
-		auto grads = esf::gradients<Var1::Element, Quadr>(inv_transp_jacobian(cell));
+		using Quadr = esf::Quadr<Element0::order - 1 + Element1::order, esf::Dim2>;
+		auto grads = esf::gradients<Element0, Quadr>(inv_transp_jacobian(cell));
 		grads *= scale;
 
-		constexpr auto n_dofs1 = Var1::Element::total_face_dofs;
-		constexpr auto n_dofs2 = Var2::Element::total_face_dofs;
-
-		return esl::make_matrix<n_dofs1, n_dofs2>(
+		return esl::make_matrix<Element0::total_face_dofs, Element1::total_face_dofs>(
 			[&grads](std::size_t row, std::size_t col)
 			{
 				return Quadr::sum([row, col, &grads](auto iq)
 				{
-					constexpr auto basis = esf::Element_quadr<Var2::Element, Quadr>::basis();
+					constexpr auto basis = esf::Element_quadr<Element1, Quadr>::basis();
 					return basis(iq, col) * grads(iq, row);
 				}).eval();
 			});
@@ -73,46 +67,77 @@ private:
 			return std::cos(2 * pt.x()) * std::sin(2 * pt.y());
 		};
 
-		const double area = esf::area(cell);
+		const double area  = esf::area(cell);
 		const auto mat_a12 = a_matrix(cell, area);
-		const auto rhs1 = esf::load_vector<Var1::Element>(rhs_fn, area);
+		const auto rhs1    = esf::load_vector<Element0>(rhs_fn, area);
 
-		const auto dofs1 = esf::dofs<0>(system(), cell);
-		const auto dofs2 = esf::dofs<1>(system(), cell);
-		for (std::size_t i1 = 0; i1 < dofs1.size(); ++i1)
-			if (const auto d1 = dofs1[i1]; d1.is_free)
+		const auto dofs0 = esf::dofs<0>(system(), cell);
+		const auto dofs1 = esf::dofs<1>(system(), cell);
+
+		for (std::size_t r = 0; r < dofs0.size(); ++r)
+			if (const auto d0r = dofs0[r]; d0r.is_free)
 			{
-				rhs_[d1.index] += rhs1[i1];
-				for (std::size_t i2 = 0; i2 < dofs2.size(); ++i2)
+				rhs_[d0r.index] += rhs1[r];
+				for (std::size_t c = 0; c < dofs1.size(); ++c)
 				{
-					const auto d2 = dofs2[i2];
-					matrix_(d1.index, d2.index) += mat_a12(i1, i2)[0];
-					matrix_(d2.index, d1.index) -= mat_a12(i1, i2)[0];
+					const auto d1c = dofs1[c];
+					const auto d2c = d1c + dofs1.size();
 
-					matrix_(d1.index, d2.index + 1) += mat_a12(i1, i2)[1];
-					matrix_(d2.index + 1, d1.index) -= mat_a12(i1, i2)[1];
+					matrix_(d0r.index, d1c.index) += mat_a12(r, c)[0];
+					matrix_(d1c.index, d0r.index) -= mat_a12(r, c)[0];
+
+					matrix_(d0r.index, d2c.index) += mat_a12(r, c)[1];
+					matrix_(d2c.index, d0r.index) -= mat_a12(r, c)[1];
 				}
 			}
 			else
-				for (std::size_t i2 = 0; i2 < dofs2.size(); ++i2)
+				for (std::size_t c = 0; c < dofs1.size(); ++c)
 				{
-					const auto d2 = dofs2[i2];
-					rhs_[d2.index] += mat_a12(i1, i2)[0] * solution_[d1.index];
-					rhs_[d2.index + 1] += mat_a12(i1, i2)[1] * solution_[d1.index];
+					const auto d1c = dofs1[c];
+					const auto d2c = d1c + dofs1.size();
+
+					rhs_[d1c.index] += mat_a12(r, c)[0] * solution_[d0r.index];
+					rhs_[d2c.index] += mat_a12(r, c)[1] * solution_[d0r.index];
 				}
 
-		const auto mat_m2 = esf::mass_matrix<Var2::Element>(area);
-		for (std::size_t i1 = 0; i1 < dofs2.size(); ++i1)
+		const auto mat_m2 = esf::mass_matrix<Element1>(area);
+		for (std::size_t r = 0; r < dofs1.size(); ++r)
 		{
-			const auto d1 = dofs2[i1];
-			for (std::size_t i2 = 0; i2 < dofs2.size(); ++i2)
+			const auto d1 = dofs1[r];
+			for (std::size_t c = 0; c < dofs1.size(); ++c)
 			{
-				const auto d2 = dofs2[i2];
-				matrix_(d1.index, d2.index) += mat_m2(i1, i2);
-				matrix_(d1.index + 1, d2.index + 1) += mat_m2(i1, i2);
+				const auto d2 = dofs1[c];
+				const auto d3 = d2 + dofs1.size();
+
+				matrix_(d1.index, d2.index) += mat_m2(r, c);
+				matrix_(d3.index, d3.index) += mat_m2(r, c);
 			}
 		}
 	}
+
+private:
+	using Element0 = typename Base::System::template Var<0>::Element;
+	using Element1 = typename Base::System::template Var<1>::Element;
+
+	using Base::system;
+	using Base::init;
+
+	using Base::solution_;
+	using Base::rhs_;
+	using Base::matrix_;
+};
+
+template<std::size_t element_order>
+class Solver_type
+{
+private:
+	using Bnd_cond = esf::Uniform_boundary_cond<esf::Lagrange<element_order>>;
+	using Var1     = esf::Var<esf::Lagrange<element_order>, 1, Bnd_cond, Bnd_cond>;
+	using Var2     = esf::Var<esf::Discontinuous_lagrange<element_order - 1>, 2>;
+	using System   = esf::System<esf::Var_list<Var1, Var2>, esf::Dof_mapper>;
+
+public:
+	using Type = Solver<System, esl::Pardiso_solver<esl::Csr_matrix<double, esl::Structural_symmetric>>>;
 };
 
 int main()
@@ -122,11 +147,11 @@ int main()
 		const auto mesh = esf::read_gmsh_mesh("mesh.msh");
 		std::cout << mesh << std::endl;
 
-		Solver solver{mesh};
-		solver.solve();
+		Solver_type<1>::Type solver1{mesh};
+		solver1.solve();
 
-		esf::write_gnuplot("mixed1.dat", solver.solution_view<0>());
-		esf::write_scattered("mixed2.dat", solver.solution_view<1>());
+		esf::write_gnuplot("mixed1_u.dat", solver1.solution_view<0>());
+		esf::write_scattered("mixed1_sxy.dat", solver1.solution_view<1>());
 	}
 	catch (const std::exception& e)
 	{

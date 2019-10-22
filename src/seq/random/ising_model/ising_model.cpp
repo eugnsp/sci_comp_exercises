@@ -28,25 +28,33 @@ public:
 
 public:
 	Ising_lattice(
-		std::size_t n, double temp, double coupling, double field, bool rand_init = true) :
-		n_(n),
-		s_(n, n), temp_(temp), coupling_(coupling), field_(field), rand_gen_(rand_dev_()),
+		const std::size_t n,
+		const double temp,
+		const double coupling,
+		const double field,
+		const bool rand_init = true)
+	:	n_(n),
+		s_(n, n),
+		temp_(temp),
+		coupling_(coupling),
+		field_(field),
+		rand_gen_(rand_dev_()),
 		rand_n_distr_(0, n_ - 1)
 	{
 		init_spins(rand_init);
 	}
 
-	void set_temp(double temp)
+	void set_temp(const double temp)
 	{
 		temp_ = temp;
 	}
 
-	void sweep(unsigned int n)
+	void sweep(const unsigned int n)
 	{
 		sweep(n, [](auto) {});
 	}
 
-	Stat_params stat_params(unsigned int n)
+	Stat_params stat_params(const unsigned int n)
 	{
 		Stat_params p{};
 
@@ -54,29 +62,30 @@ public:
 		auto magn = total_magnetization();
 		std::size_t i = 1;
 
-		sweep(n, [&](auto d_en_magn) {
-			en += d_en_magn.first;
+		sweep(n, [&](auto d_en_magn)
+		{
+			en   += d_en_magn.first;
 			magn += d_en_magn.second;
 
-			p.energy += (en - p.energy) / i;
-			p.magnetization += (std::abs(magn) - p.magnetization) / i;
-			p.sp_heat += (sq(en) - p.sp_heat) / i;
+			p.energy         += (en - p.energy) / i;
+			p.magnetization  += (std::abs(magn) - p.magnetization) / i;
+			p.sp_heat        += (sq(en) - p.sp_heat) / i;
 			p.susceptibility += (sq(magn) - p.susceptibility) / i;
 
 			++i;
 		});
 
-		p.sp_heat = (p.sp_heat - sq(p.energy)) / sq(temp_);
+		p.sp_heat        = (p.sp_heat - sq(p.energy)) / sq(temp_);
 		p.susceptibility = (p.susceptibility - sq(p.magnetization)) / temp_;
 
-		p.energy /= sq(n_);
-		p.magnetization /= sq(n_);
-		p.sp_heat /= sq(n_);
+		p.energy         /= sq(n_);
+		p.magnetization  /= sq(n_);
+		p.sp_heat        /= sq(n_);
 		p.susceptibility /= sq(n_);
 		return p;
 	}
 
-	void write(std::string file_name) const
+	void write(const std::string& file_name) const
 	{
 		std::ofstream file;
 		file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
@@ -92,17 +101,17 @@ public:
 	}
 
 private:
-	std::size_t prev(std::size_t i) const
+	std::size_t prev(const std::size_t i) const
 	{
 		return (i == 0) ? n_ - 1 : i - 1;
 	}
 
-	std::size_t next(std::size_t i) const
+	std::size_t next(const std::size_t i) const
 	{
 		return (i == n_ - 1) ? 0 : i + 1;
 	}
 
-	void init_spins(bool rand_init)
+	void init_spins(const bool rand_init)
 	{
 		std::bernoulli_distribution rand_distr;
 		for (std::size_t col = 0; col < n_; ++col)
@@ -110,7 +119,7 @@ private:
 				s_(row, col) = (!rand_init || rand_distr(rand_gen_)) ? 1 : -1;
 	}
 
-	bool take_step(double d_en)
+	bool take_step(const double d_en)
 	{
 		if (d_en <= 0)
 			return true;
@@ -119,7 +128,8 @@ private:
 		return w > rand_unit_distr_(rand_gen_);
 	}
 
-	int neighbour_sum(std::size_t row, std::size_t col) const
+	int neighbour_sum(const std::size_t row,
+					  const std::size_t col) const
 	{
 		return s_(prev(row), col) + s_(next(row), col) + s_(row, prev(col)) + s_(row, next(col));
 	}
@@ -140,7 +150,8 @@ private:
 	}
 
 	template<class Fn>
-	std::size_t sweep(std::size_t n, Fn&& fn)
+	std::size_t sweep(std::size_t n,
+					  Fn&& 		  fn)
 	{
 		const auto n_steps = n * sq(n_);
 		for (std::size_t i = 0; i < n_steps; ++i)
@@ -172,20 +183,22 @@ private:
 	}
 
 private:
-	const std::size_t n_;
+	const std::size_t  n_;
 	esl::Matrix_x<int> s_;
 
-	double temp_;
+	double 		 temp_;
 	const double coupling_;
 	const double field_;
 
 	std::random_device rand_dev_;
-	std::mt19937 rand_gen_;
+	std::mt19937       rand_gen_;
 	std::uniform_int_distribution<std::size_t> rand_n_distr_;
-	std::uniform_real_distribution<double> rand_unit_distr_;
+	std::uniform_real_distribution<double>     rand_unit_distr_;
 };
 
-void params_vs_temp(double field, std::string file_name)
+void params_vs_temp(
+	const double 	   field,
+	const std::string& file_name)
 {
 	std::ofstream file;
 	file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
@@ -222,7 +235,7 @@ void lattice_after_sweep()
 
 int main()
 {
-	params_vs_temp(0, "mt0.txt");
+	params_vs_temp(0,  "mt0.txt");
 	params_vs_temp(.1, "mt1.txt");
 	params_vs_temp(.5, "mt2.txt");
 

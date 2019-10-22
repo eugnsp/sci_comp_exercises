@@ -1,3 +1,4 @@
 -*
-*.dat
+src/**/*.dat
+src/**/*.png
 build/

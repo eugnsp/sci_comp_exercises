@@ -12,4 +12,4 @@ Standard FEM with <code>P<sub>4</sub></code> Lagrange elements on a coarse mesh:
 ![Equation solution](/figs/seq/lin/poisson_2d_fem/std.png)
 
 Mixed FEM with <code>P<sub>1</sub></code> Lagrange + <code>DP<sub>0</sub></code> discontinuous Lagrange elements on a fine mesh:
-![Equation solution](/figs/seq/lin/poisson_2d_fem/mixed.png)
+![Equation solution](/figs/seq/lin/poisson_2d_fem/mixed1.png)

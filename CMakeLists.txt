@@ -14,8 +14,8 @@ foreach(CPP_FILE ${CPP_FILES})
 	target_include_directories(${F_NAME} PUBLIC "include")
 	target_compile_features(${F_NAME} PUBLIC cxx_std_17)
 	target_compile_definitions(${F_NAME} PUBLIC _USE_MATH_DEFINES)
-	target_compile_options(${F_NAME} PUBLIC -Wall -Wpedantic -Wextra -Werror=return-type -m64 -march=native -Wno-deprecated-declarations 
-		$<$<CONFIG:DEBUG>:-O0 -g> $<$<CONFIG:RELEASE>:-Wno-unused-parameter -O3 -DNDEBUG>)
+	target_compile_options(${F_NAME} PUBLIC -Wall -Wpedantic -Wextra -Werror=return-type -Wno-psabi -Wno-deprecated-declarations -m64 -march=native
+		$<$<CONFIG:DEBUG>:-O0 -ggdb> $<$<CONFIG:RELEASE>:-Wno-unused-parameter -O3 -DNDEBUG>)
 	target_link_libraries(${F_NAME} eslib)
 endforeach()
 

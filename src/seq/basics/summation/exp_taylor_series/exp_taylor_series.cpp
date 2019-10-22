@@ -9,8 +9,14 @@
 
 #define DISPLAY_AS_HEX
 
-template<class Fn, typename T>
-auto sum(Fn fn, T sum_init, unsigned long long n_init = 1, const unsigned long long n_step = 1)
+template<
+	class    Fn,
+	typename T>
+auto sum(
+	Fn						 fn,
+	const T 				 sum_init,
+	unsigned long long 		 n_init = 1,
+	const unsigned long long n_step = 1)
 {
 	while (true)
 	{
@@ -85,8 +91,8 @@ int main()
 	std::cout << std::fixed;
 #endif
 
-	test_exp_precision(10);
-	test_exp_precision(5);
+	test_exp_precision( 10);
+	test_exp_precision( 5);
 	test_exp_precision(-5);
 	test_exp_precision(-10);
 

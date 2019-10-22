@@ -13,7 +13,11 @@ template<typename T>
 class Binary_prn
 {
 public:
-	Binary_prn(T value, std::size_t n = CHAR_BIT * sizeof(T)) : value_(value), n_(n)
+	Binary_prn(
+		T           value,
+		std::size_t n = CHAR_BIT * sizeof(T))
+	:	value_(value),
+		n_(n)
 	{}
 
 	void operator()(std::ostream& os) const
@@ -26,12 +30,14 @@ public:
 	}
 
 private:
-	const T value_;
+	const T	  	      value_;
 	const std::size_t n_;
 };
 
 template<typename T>
-std::ostream& operator<<(std::ostream& os, Binary_prn<T> bin)
+std::ostream& operator<<(
+	std::ostream& os,
+	Binary_prn<T> bin)
 {
 	bin(os);
 	return os;
@@ -79,7 +85,7 @@ void test(T value)
 	std::cout << value << '\n'
 			  << "Value    = " << Binary_prn{bit_cast(value)} << '\n'
 			  << "Sign     = " << (sign(value) ? 1 : 0) << '\n'
-			  << "Exponent =  " << Binary_prn{exponent(value), exponent_size<T>} << '\n'
+			  << "Exponent = " << Binary_prn{exponent(value), exponent_size<T>} << '\n'
 			  << "Mantissa = " << std::string(exponent_size<T> + 1, ' ')
 			  << Binary_prn{mantissa(value), mantissa_size<T>} << '\n'
 			  << "Type     = " << classify_as_string(value) << '\n'
@@ -95,22 +101,22 @@ void test(T value)
 template<typename T>
 void test()
 {
-	test(static_cast<T>(0));
+	test( static_cast<T>(0));
 	test(-static_cast<T>(0));
-	test(static_cast<T>(0.1));
+	test( static_cast<T>(0.1));
 	test(-static_cast<T>(0.1));
-	test(static_cast<T>(1));
+	test( static_cast<T>(1));
 	test(-static_cast<T>(1));
 
-	test(std::numeric_limits<T>::min());
-	test(std::numeric_limits<T>::lowest());
-	test(std::numeric_limits<T>::max());
-	test(std::numeric_limits<T>::denorm_min());
-	test(std::numeric_limits<T>::epsilon());
-	test(std::numeric_limits<T>::infinity());
+	test( std::numeric_limits<T>::min());
+	test( std::numeric_limits<T>::lowest());
+	test( std::numeric_limits<T>::max());
+	test( std::numeric_limits<T>::denorm_min());
+	test( std::numeric_limits<T>::epsilon());
+	test( std::numeric_limits<T>::infinity());
 	test(-std::numeric_limits<T>::infinity());
-	test(std::numeric_limits<T>::quiet_NaN());
-	test(std::numeric_limits<T>::signaling_NaN());
+	test( std::numeric_limits<T>::quiet_NaN());
+	test( std::numeric_limits<T>::signaling_NaN());
 }
 
 int main()

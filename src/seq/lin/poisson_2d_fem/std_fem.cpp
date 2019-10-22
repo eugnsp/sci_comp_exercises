@@ -11,28 +11,24 @@
 #include <exception>
 #include <iostream>
 
-constexpr std::size_t element_order = 4;
-
-using Bc = esf::Uniform_boundary_cond<esf::Lagrange<element_order>>;
-using Var = esf::Var<esf::Lagrange<element_order>, 1, Bc, Bc>;
-using System = esf::System<esf::Var_list<Var>>;
-
-using Sp_solver = esl::Pardiso_solver<esl::Csr_matrix<double, esl::Symmetric_upper>>;
-
+template<
+	class System,
+	class Sp_solver>
 class Solver : public esf::Matrix_based_solver<System, Sp_solver>
 {
 private:
 	using Base = esf::Matrix_based_solver<System, Sp_solver>;
 
 public:
-	Solver(const esf::Mesh2& mesh) : Base(mesh)
+	Solver(const esf::Mesh2& mesh)
+	:	Base(mesh)
 	{
 		const auto br = mesh.bounding_rect();
 		const esf::Linestring bnd1{br.bottom_left(), br.top_left()};
 		const esf::Linestring bnd2{br.bottom_right(), br.top_right()};
 
-		system().variable().set_bnd_cond<0>(mesh, bnd1, 0);
-		system().variable().set_bnd_cond<1>(mesh, bnd2, 0.25);
+		system().variable().template set_bnd_cond<0>(mesh, bnd1, 0);
+		system().variable().template set_bnd_cond<1>(mesh, bnd2, 0.25);
 
 		init();
 		compute_and_set_sparsity_pattern(system(), matrix_);
@@ -54,26 +50,48 @@ private:
 		};
 
 		const double area = esf::area(cell);
-		const auto mat = esf::stiffness_matrix<Var::Element>(cell, area);
-		const auto rhs = esf::load_vector<Var::Element>(rhs_fn, area);
+		const auto mat    = esf::stiffness_matrix<Element>(cell, area);
+		const auto rhs    = esf::load_vector<Element>(rhs_fn, area);
 
 		const auto dofs = esf::dofs(system(), cell);
-		for (std::size_t i1 = 0; i1 < dofs.size(); ++i1)
-			if (const auto d1 = dofs[i1]; d1.is_free)
+		for (std::size_t c = 0; c < dofs.size(); ++c)
+			if (const auto dc = dofs[c]; dc.is_free)
 			{
-				rhs_[d1.index] += rhs[i1];
-				for (std::size_t i2 = 0; i2 <= i1; ++i2)
-					if (auto d2 = dofs[i2]; d2.is_free)
+				rhs_[dc.index] += rhs[c];
+				for (std::size_t r = 0; r <= c; ++r)
+					if (auto dr = dofs[r]; dr.is_free)
 					{
-						const auto [dr, dc] = esu::sorted(d1.index, d2.index);
-						matrix_(dr, dc) += mat(i2, i1);
+						const auto [d1, d2] = esu::sorted(dc.index, dr.index);
+						matrix_(d1, d2) += mat(r, c);
 					}
 			}
 			else
-				for (std::size_t i2 = 0; i2 < dofs.size(); ++i2)
-					if (auto d2 = dofs[i2]; d2.is_free)
-						rhs_[d2.index] -= mat(i2, i1) * solution_[d1.index];
+				for (std::size_t r = 0; r < dofs.size(); ++r)
+					if (auto dr = dofs[r]; dr.is_free)
+						rhs_[dr.index] -= mat(r, c) * solution_[dc.index];
 	}
+
+private:
+	using Element = typename Base::System::template Var<0>::Element;
+
+	using Base::system;
+	using Base::init;
+
+	using Base::solution_;
+	using Base::rhs_;
+	using Base::matrix_;
+};
+
+template<std::size_t element_order>
+class Solver_type
+{
+private:
+	using Bnd_cond = esf::Uniform_boundary_cond<esf::Lagrange<element_order>>;
+	using Var      = esf::Var<esf::Lagrange<element_order>, 1, Bnd_cond, Bnd_cond>;
+	using System   = esf::System<esf::Var_list<Var>>;
+
+public:
+	using Type = Solver<System, esl::Pardiso_solver<esl::Csr_matrix<double, esl::Symmetric_upper>>>;
 };
 
 int main()
@@ -83,11 +101,11 @@ int main()
 		const auto mesh = esf::read_gmsh_mesh("mesh2.msh");
 		std::cout << mesh << std::endl;
 
-		Solver solver{mesh};
+		Solver_type<4>::Type solver{mesh};
 		solver.solve();
 
-		esf::write_gnuplot("std.dat", solver.solution_view<0>());
-		esf::write_interp("std_interp.dat", solver.solution_view<0>(), 0.01);
+		esf::write_gnuplot("std_u.dat", solver.solution_view<0>());
+		esf::write_interp("std_u_interp.dat", solver.solution_view<0>(), 0.01);
 	}
 	catch (const std::exception& e)
 	{
