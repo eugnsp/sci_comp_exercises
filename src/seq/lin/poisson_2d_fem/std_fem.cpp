@@ -11,17 +11,14 @@
 #include <exception>
 #include <iostream>
 
-template<
-	class System,
-	class Sp_solver>
+template<class System, class Sp_solver>
 class Solver : public esf::Matrix_based_solver<System, Sp_solver>
 {
 private:
 	using Base = esf::Matrix_based_solver<System, Sp_solver>;
 
 public:
-	Solver(const esf::Mesh2& mesh)
-	:	Base(mesh)
+	Solver(const esf::Mesh2& mesh) : Base(mesh)
 	{
 		const auto br = mesh.bounding_rect();
 		const esf::Linestring bnd1{br.bottom_left(), br.top_left()};
@@ -59,7 +56,7 @@ private:
 			{
 				rhs_[dc.index] += rhs[c];
 				for (std::size_t r = 0; r <= c; ++r)
-					if (auto dr = dofs[r]; dr.is_free)
+					if (const auto dr = dofs[r]; dr.is_free)
 					{
 						const auto [d1, d2] = esu::sorted(dc.index, dr.index);
 						matrix_(d1, d2) += mat(r, c);
@@ -67,19 +64,19 @@ private:
 			}
 			else
 				for (std::size_t r = 0; r < dofs.size(); ++r)
-					if (auto dr = dofs[r]; dr.is_free)
+					if (const auto dr = dofs[r]; dr.is_free)
 						rhs_[dr.index] -= mat(r, c) * solution_[dc.index];
 	}
 
 private:
 	using Element = typename Base::System::template Var<0>::Element;
 
-	using Base::system;
 	using Base::init;
+	using Base::system;
 
-	using Base::solution_;
-	using Base::rhs_;
 	using Base::matrix_;
+	using Base::rhs_;
+	using Base::solution_;
 };
 
 template<std::size_t element_order>
@@ -94,6 +91,8 @@ public:
 	using Type = Solver<System, esl::Pardiso_solver<esl::Csr_matrix<double, esl::Symmetric_upper>>>;
 };
 
+template<class> class TD ;
+
 int main()
 {
 	try
@@ -104,8 +103,8 @@ int main()
 		Solver_type<4>::Type solver{mesh};
 		solver.solve();
 
-		esf::write_gnuplot("std_u.dat", solver.solution_view<0>());
-		esf::write_interp("std_u_interp.dat", solver.solution_view<0>(), 0.01);
+		esf::write_gnuplot("std_u.dat",        solver.solution_view<0>());
+		esf::write_interp( "std_u_interp.dat", solver.solution_view<0>(), 0.01);
 	}
 	catch (const std::exception& e)
 	{

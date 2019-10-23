@@ -6,13 +6,8 @@
 #include <type_traits>
 #include <utility>
 
-template<
-	class T,
-	class Fn>
-auto plain_sum(
-	T       n0,
-	const T n1,
-	Fn 		fn)
+template<class T, class Fn>
+auto plain_sum(T n0, const T n1, Fn fn)
 {
 	std::invoke_result_t<Fn, T> sum{};
 	while (n0 <= n1)
@@ -21,13 +16,8 @@ auto plain_sum(
 	return sum;
 }
 
-template<
-	class T,
-	class Fn>
-auto kahan_sum(
-	T 		n0,
-	const T n1,
-	Fn 		fn)
+template<class T, class Fn>
+auto kahan_sum(T n0, const T n1, Fn fn)
 {
 	std::invoke_result_t<Fn, T> sum{};
 	std::invoke_result_t<Fn, T> carry{};

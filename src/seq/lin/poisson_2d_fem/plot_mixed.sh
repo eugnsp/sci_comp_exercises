@@ -1,7 +1,7 @@
 #!/usr/bin/gnuplot
 
 set terminal pngcairo size 1000,700 
-set output 'mixed1.png'
+set output 'mixed.png'
 set title "Mixed FEM solution (P_1 + DP@_0^2 elements) of the BVP -{/Symbol D}u(x, y) = cos(2x) sin(2y)"
 
 set grid
@@ -13,7 +13,7 @@ set yrange [0:3]
 set zrange [-.15:.35]
 set xyplane at -.15
 
-splot 'mixed1_u.dat' with lines title 'u', \
-	  'mixed1_sxy.dat' using 1:2:(-.15):($3/4):($4/4):(0) with vectors title '{/:Bold {/Symbol s}} = {/Symbol \321}u'
+splot 'mixed_u.dat' with lines title 'u', \
+	  'mixed_sv.dat' using 1:2:(-.15):($3/2):($4/2):(0) with vectors head filled title '{/:Bold {/Symbol s}} = {/Symbol \321}u'
 
 

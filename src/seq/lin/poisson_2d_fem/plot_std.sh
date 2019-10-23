@@ -14,7 +14,7 @@ set zrange [-.15:.35]
 set xyplane at -.15
 
 set multiplot
-splot 'std_u.dat' with lines linecolor 2 notitle
+splot 'std_u.dat' with lines linecolor 1 notitle
 
 set title ""
 unset xlabel
@@ -24,5 +24,5 @@ unset tics
 unset border
 
 set dgrid3d 50,50,4
-splot 'std_u_interp.dat' with lines title 'u'
+splot 'std_u_interp.dat' with lines linecolor 3 title 'u'
 

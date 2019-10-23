@@ -12,18 +12,14 @@ class Uniform_distr_on_sphere
 {
 public:
 	Uniform_distr_on_sphere()
-	:	rand_dist_s_(-1, 1),
-		rand_dist_phi_(0, 2 * esc::pi)
+		: rand_dist_s_(-1, 1), rand_dist_phi_(0, 2 * esc::pi)
 	{}
 
 	template<class Random_generator>
-	auto operator()(
-		Random_generator& gen,
-		const double      radius = 1)
-	-> std::array<T, 3>
+	auto operator()(Random_generator& gen, const double radius = 1) -> std::array<T, 3>
 	{
-		const auto s   = rand_dist_s_(gen);
-		const auto t   = std::sqrt(1 - s * s);
+		const auto s = rand_dist_s_(gen);
+		const auto t = std::sqrt(1 - s * s);
 		const auto phi = rand_dist_phi_(gen);
 
 		return {radius * t * std::cos(phi), radius * t * std::sin(phi), radius * s};

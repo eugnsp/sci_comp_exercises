@@ -25,14 +25,8 @@ T off(const esl::Matrix_x<T>& m)
 }
 
 template<typename T>
-void rotate(
-	esl::Matrix_x<T>& m,
-	const std::size_t row1,
-	const std::size_t col1,
-	const std::size_t row2,
-	const std::size_t col2,
-	const T 		  cos,
-	const T 		  sin)
+void rotate(esl::Matrix_x<T>& m, const std::size_t row1, const std::size_t col1,
+	        const std::size_t row2, const std::size_t col2, const T cos, const T sin)
 {
 	const auto m1 = m(row1, col1);
 	const auto m2 = m(row2, col2);
@@ -44,11 +38,8 @@ void rotate(
 // the algorithm is a simplified version of that described in "Linear algebra" (J.H.Wilkinson)
 // and "Numerical recipes" (W.H.Press)
 template<typename T>
-unsigned int jacobi_eigenpairs(
-	esl::Matrix_x<T>  mat,
-	esl::Matrix_x<T>& vecs,
-	esl::Vector_x<T>& vals,
-	const T			  delta)
+unsigned int jacobi_eigenpairs(esl::Matrix_x<T> mat, esl::Matrix_x<T>& vecs,
+                               esl::Vector_x<T>& vals, const T delta)
 {
 	assert(mat.rows() == mat.cols());
 	const auto n = mat.rows();
@@ -102,10 +93,7 @@ unsigned int jacobi_eigenpairs(
 }
 
 template<typename T>
-bool have_same_elements(
-	esl::Vector_x<double>& vec1,
-	esl::Vector_x<double>& vec2,
-	const T 			   delta)
+bool have_same_elements(esl::Vector_x<double>& vec1, esl::Vector_x<double>& vec2, const T delta)
 {
 	if (vec1.size() != vec2.size())
 		return false;

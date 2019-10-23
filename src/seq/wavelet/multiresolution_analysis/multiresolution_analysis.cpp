@@ -11,17 +11,17 @@
 #include <type_traits>
 #include <vector>
 
-using esc::sqrt_half;
-using esc::sqrt_two;
-using esc::sqrt_three;
 using esc::pi;
+using esc::sqrt_half;
+using esc::sqrt_three;
+using esc::sqrt_two;
 
 struct Haar_wavelet
 {
 	static constexpr double forward[2][2] = {{sqrt_half, sqrt_half}, {sqrt_half, -sqrt_half}};
 
 	static constexpr std::ptrdiff_t backward_shift = 0;
-	static constexpr double backward_c[2][1] = {{sqrt_half}, { sqrt_half}};
+	static constexpr double backward_c[2][1] = {{sqrt_half}, {sqrt_half}};
 	static constexpr double backward_d[2][1] = {{sqrt_half}, {-sqrt_half}};
 };
 
@@ -56,38 +56,23 @@ bool is_pow2(T x)
 	return (x & (x - 1)) == 0;
 }
 
-template<
-	class Vec1,
-	class Vec2>
-bool are_equal(
-	const Vec1&  v1,
-	const Vec2&  v2,
-	const double tol = 1e-6)
+template<class Vec1, class Vec2>
+bool are_equal(const Vec1& v1, const Vec2& v2, const double tol = 1e-6)
 {
 	const auto eq = [tol](auto x, auto y) { return std::abs(x - y) <= tol; };
 	return std::equal(v1.begin(), v1.end(), v2.begin(), v2.end(), eq);
 }
 
-template<
-	class    Vec,
-	typename T>
-void zero_small_coeffs(
-	Vec&    vec,
-	const T max_value)
+template<class Vec, typename T>
+void zero_small_coeffs(Vec& vec, const T max_value)
 {
 	for (auto& v : vec)
 		if (std::abs(v) < max_value)
 			v = 0;
 }
 
-template<
-	class    Fn,
-	typename T>
-auto fn_sample(
-	Fn&& 			  fn,
-	const std::size_t n,
-	const T 		  x_min,
-	const T 		  x_max)
+template<class Fn, typename T>
+auto fn_sample(Fn&& fn, const std::size_t n, const T x_min, const T x_max)
 {
 	std::vector<T> xs;
 	std::vector<std::invoke_result_t<Fn, T>> values;
@@ -104,15 +89,8 @@ auto fn_sample(
 	return std::make_pair(xs, values);
 }
 
-template<
-	class 		   Wavelet,
-	class 		   In,
-	class 		   Out,
-	std::size_t... is>
-void wavelet_forward_impl(
-	const In& in,
-	Out&      out,
-	std::index_sequence<is...>)
+template<class Wavelet, class In, class Out, std::size_t... is>
+void wavelet_forward_impl(const In& in, Out& out, std::index_sequence<is...>)
 {
 	assert(is_pow2(in.size()));
 	auto n = in.size();
@@ -134,15 +112,8 @@ void wavelet_forward_impl(
 	}
 }
 
-template<
-	class          Wavelet,
-	class          In,
-	class          Out,
-	std::size_t... is>
-void wavelet_backward_impl(
-	const In& in,
-	Out& 	  out,
-	std::index_sequence<is...>)
+template<class Wavelet, class In, class Out, std::size_t... is>
+void wavelet_backward_impl(const In& in, Out& out, std::index_sequence<is...>)
 {
 	assert(is_pow2(in.size()));
 	const auto n = in.size();
@@ -158,44 +129,31 @@ void wavelet_backward_impl(
 		for (std::size_t k = 0; k < j; ++k)
 		{
 			const std::size_t ks[] = {((k + is + Wavelet::backward_shift) % j)...};
-			out[2 * k]	   = ((Wavelet::backward_c[0][is] * tmp[ks[is]])     + ...) +
-							 ((Wavelet::backward_d[0][is] * tmp[j + ks[is]]) + ...);
-			out[2 * k + 1] = ((Wavelet::backward_c[1][is] * tmp[ks[is]])     + ...) +
+			out[2 * k] = ((Wavelet::backward_c[0][is] * tmp[ks[is]]) + ...) +
+						 ((Wavelet::backward_d[0][is] * tmp[j + ks[is]]) + ...);
+			out[2 * k + 1] = ((Wavelet::backward_c[1][is] * tmp[ks[is]]) + ...) +
 							 ((Wavelet::backward_d[1][is] * tmp[j + ks[is]]) + ...);
 		}
 		j = j2;
 	}
 }
 
-template<
-	class Wavelet,
-	class In,
-	class Out>
-void wavelet_forward(
-	const In& in,
-	Out& 	  out)
+template<class Wavelet, class In, class Out>
+void wavelet_forward(const In& in, Out& out)
 {
 	constexpr auto n = std::extent_v<decltype(Wavelet::forward), 1>;
 	wavelet_forward_impl<Wavelet>(in, out, std::make_index_sequence<n>{});
 }
 
-template<
-	class Wavelet,
- 	class In,
-	class Out>
-void wavelet_backward(
-	const In& in,
-	Out& 	  out)
+template<class Wavelet, class In, class Out>
+void wavelet_backward(const In& in, Out& out)
 {
 	constexpr auto n = std::extent_v<decltype(Wavelet::backward_c), 1>;
 	wavelet_backward_impl<Wavelet>(in, out, std::make_index_sequence<n>{});
 }
 
 template<class Wavelet>
-void wavelet_test(
-	const std::string& file_name,
-	const double 	   eps1,
-	const double 	   eps2)
+void wavelet_test(const std::string& file_name, const double eps1, const double eps2)
 {
 	const unsigned int j = 10;
 	const std::size_t n = 1u << j;
@@ -229,9 +187,9 @@ void wavelet_test(
 
 int main()
 {
-	wavelet_test<Haar_wavelet>(      "haar.txt",       .025, .25);
-	wavelet_test<Schauder_wavelet>(  "schauder.txt",   .1,   .5);
-	wavelet_test<Daubechies_wavelet>("daubechies.txt", .1,   .5);
+	wavelet_test<Haar_wavelet>("haar.txt", .025, .25);
+	wavelet_test<Schauder_wavelet>("schauder.txt", .1, .5);
+	wavelet_test<Daubechies_wavelet>("daubechies.txt", .1, .5);
 
 	return 0;
 }

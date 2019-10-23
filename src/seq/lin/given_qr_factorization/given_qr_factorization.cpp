@@ -13,10 +13,7 @@
 #include <utility>
 
 template<typename T>
-bool is_eq(
-	const esl::Matrix_x<T>& mat_a,
-	const esl::Matrix_x<T>& mat_b,
-	const T 				tol = 1e-6)
+bool is_eq(const esl::Matrix_x<T>& mat_a, const esl::Matrix_x<T>& mat_b, const T tol = 1e-6)
 {
 	if (mat_a.rows() != mat_b.rows() || mat_a.cols() != mat_b.cols())
 		return false;
@@ -85,14 +82,8 @@ std::pair<T, T> inv_rho(const T rho)
 }
 
 template<typename T>
-void rotate(
-	esl::Matrix_x<T>& m,
-	const std::size_t row1,
-	const std::size_t col1,
-	const std::size_t row2,
-	const std::size_t col2,
-	const T    		  cos,
-	const T    		  sin)
+void rotate(esl::Matrix_x<T>& m, const std::size_t row1, const std::size_t col1,
+	const std::size_t row2, const std::size_t col2, const T cos, const T sin)
 {
 	const auto m1 = m(row1, col1);
 	const auto m2 = m(row2, col2);

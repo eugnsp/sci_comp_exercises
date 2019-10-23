@@ -10,17 +10,16 @@
 #include <exception>
 #include <iostream>
 
-template<
-	class System,
-	class Sp_solver>
+template<class System, class Sp_solver>
 class Solver : public esf::Matrix_based_solver<System, Sp_solver>
 {
 private:
-	using Base = esf::Matrix_based_solver<System, Sp_solver>;
+	using Base     = esf::Matrix_based_solver<System, Sp_solver>;
+	using Element0 = typename esf::Var_type<System, 0>::Element;
+	using Element1 = typename esf::Var_type<System, 1>::Element;
 
 public:
-	Solver(const esf::Mesh2& mesh)
-	:	Base(mesh)
+	Solver(const esf::Mesh2& mesh) : Base(mesh)
 	{
 		const auto br = mesh.bounding_rect();
 		const esf::Linestring bnd1{br.bottom_left(), br.top_left()};
@@ -34,9 +33,7 @@ public:
 	}
 
 private:
-	static auto a_matrix(
-		const esf::Mesh2::Cell_view& cell,
-		const double 				 scale)
+	static auto a_matrix(const esf::Mesh2::Cell_view& cell, const double scale)
 	{
 		using Quadr = esf::Quadr<Element0::order - 1 + Element1::order, esf::Dim2>;
 		auto grads = esf::gradients<Element0, Quadr>(inv_transp_jacobian(cell));
@@ -67,9 +64,9 @@ private:
 			return std::cos(2 * pt.x()) * std::sin(2 * pt.y());
 		};
 
-		const double area  = esf::area(cell);
+		const double area = esf::area(cell);
 		const auto mat_a12 = a_matrix(cell, area);
-		const auto rhs1    = esf::load_vector<Element0>(rhs_fn, area);
+		const auto rhs1 = esf::load_vector<Element0>(rhs_fn, area);
 
 		const auto dofs0 = esf::dofs<0>(system(), cell);
 		const auto dofs1 = esf::dofs<1>(system(), cell);
@@ -81,7 +78,7 @@ private:
 				for (std::size_t c = 0; c < dofs1.size(); ++c)
 				{
 					const auto d1c = dofs1[c];
-					const auto d2c = d1c + dofs1.size();
+					const auto d2c = d1c + 1;
 
 					matrix_(d0r.index, d1c.index) += mat_a12(r, c)[0];
 					matrix_(d1c.index, d0r.index) -= mat_a12(r, c)[0];
@@ -94,7 +91,7 @@ private:
 				for (std::size_t c = 0; c < dofs1.size(); ++c)
 				{
 					const auto d1c = dofs1[c];
-					const auto d2c = d1c + dofs1.size();
+					const auto d2c = d1c + 1;
 
 					rhs_[d1c.index] += mat_a12(r, c)[0] * solution_[d0r.index];
 					rhs_[d2c.index] += mat_a12(r, c)[1] * solution_[d0r.index];
@@ -107,7 +104,7 @@ private:
 			for (std::size_t c = 0; c < dofs1.size(); ++c)
 			{
 				const auto d2 = dofs1[c];
-				const auto d3 = d2 + dofs1.size();
+				const auto d3 = d2 + 1;
 
 				matrix_(d1.index, d2.index) += mat_m2(r, c);
 				matrix_(d3.index, d3.index) += mat_m2(r, c);
@@ -116,15 +113,12 @@ private:
 	}
 
 private:
-	using Element0 = typename Base::System::template Var<0>::Element;
-	using Element1 = typename Base::System::template Var<1>::Element;
-
-	using Base::system;
 	using Base::init;
+	using Base::system;
 
-	using Base::solution_;
-	using Base::rhs_;
 	using Base::matrix_;
+	using Base::rhs_;
+	using Base::solution_;
 };
 
 template<std::size_t element_order>
@@ -137,7 +131,8 @@ private:
 	using System   = esf::System<esf::Var_list<Var1, Var2>, esf::Dof_mapper>;
 
 public:
-	using Type = Solver<System, esl::Pardiso_solver<esl::Csr_matrix<double, esl::Structural_symmetric>>>;
+	using Type =
+		Solver<System, esl::Pardiso_solver<esl::Csr_matrix<double, esl::Structural_symmetric>>>;
 };
 
 int main()
@@ -150,8 +145,9 @@ int main()
 		Solver_type<1>::Type solver1{mesh};
 		solver1.solve();
 
-		esf::write_gnuplot("mixed1_u.dat", solver1.solution_view<0>());
-		esf::write_scattered("mixed1_sxy.dat", solver1.solution_view<1>());
+		esf::write_gnuplot(  "mixed_u.dat",   solver1.solution_view<0>());
+		esf::write_gnuplot(  "mixed_s.dat",   solver1.solution_view<1>());
+		esf::write_scattered("mixed_sv.dat", solver1.solution_view<1>());
 	}
 	catch (const std::exception& e)
 	{
